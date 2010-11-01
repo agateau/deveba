@@ -14,15 +14,20 @@ class OptionError(Exception):
     pass
 
 def setup_logger(name, quiet):
+    args = {}
     if quiet:
         level = logging.WARNING
     else:
         level = logging.INFO
-    args = dict(level=level)
+    args["level"] = level
+
     if name == "-":
         args["stream"] = sys.stderr
     else:
         args["filename"] = name
+
+    args["format"] = "%(levelname)s: %(asctime)s: %(message)s"
+
     logging.basicConfig(**args)
 
 def do_list(groups):
