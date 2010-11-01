@@ -8,7 +8,7 @@ from path import path
 from config import Config
 from proginfo import ProgInfo
 
-CONFIG_FILE = "~/.config/deveba.ini"
+CONFIG_FILE = "~/.config/deveba/deveba.xml"
 
 class OptionError(Exception):
     pass
@@ -33,7 +33,7 @@ def setup_logger(name, quiet):
 def do_list(groups):
     for group in groups:
         print group
-        for repo in group.repositories():
+        for repo in group.repositories.values():
             print "- %s" % repo
 
 def do_backup(groups):
