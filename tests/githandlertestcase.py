@@ -5,34 +5,51 @@ import unittest
 
 from path import path
 
-from githandler import run_git, get_status, GitHandler
+from githandler import GitRepo, GitHandler
 
 def create_file(name):
     path(name).touch()
 
 def create_repository():
-    repo = tempfile.mkdtemp(suffix="-unittest", dir=os.getcwd())
-    run_git("init", repo)
-    return path(repo).abspath()
+    sandbox = path(tempfile.mkdtemp(suffix="-unittest"))
+
+    origin_repo_path = sandbox / "repo.git"
+    origin_repo_path.mkdir()
+    origin_repo = GitRepo(origin_repo_path)
+    origin_repo.run_git("init", "--bare")
+
+    repo = GitRepo.clone(origin_repo.path, sandbox / "repo", "--no-hardlinks")
+    create_file(repo.path / "dummy")
+    repo.run_git("add", "dummy")
+    repo.run_git("commit", "-m", "created")
+    repo.run_git("push", "origin", "master:master")
+    return sandbox, origin_repo, repo
 
 class GitHandlerTestCase(unittest.TestCase):
     def setUp(self):
         self.old_cwd = os.getcwd()
-        self.repository = create_repository()
-        os.chdir(self.repository)
+        self.sandbox, self.origin_repository, self.repository = create_repository()
+        os.chdir(self.repository.path)
 
     def tearDown(self):
         os.chdir(self.old_cwd)
-        self.repository.rmtree()
+        self.sandbox.rmtree()
 
     def test_get_status(self):
         create_file("modified")
-        run_git("add", "modified")
+        self.repository.run_git("add", "modified")
         new_file1 = "new"
         new_file2 = "néè"
         create_file(new_file1)
         create_file(new_file2)
 
-        changes, new_files = get_status()
+        changes, new_files = self.repository.get_status()
         self.assert_(changes)
         self.assertEqual(new_files, [new_file1, new_file2])
+
+    def test_need_to_push(self):
+        self.assert_(not self.repository.need_to_push())
+        create_file("new")
+        self.repository.run_git("add", "new")
+        self.repository.run_git("commit", "-m", "msg")
+        self.assert_(self.repository.need_to_push())
