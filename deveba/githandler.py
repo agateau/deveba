@@ -82,7 +82,7 @@ class GitHandler(Handler):
         self.repo.run_git("fetch")
 
     def need_merge(self):
-        self.repo.need_merge()
+        return self.repo.need_merge()
 
     def merge(self):
         self.repo.run_git("merge", "origin/master")
