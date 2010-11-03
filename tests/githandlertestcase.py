@@ -47,12 +47,12 @@ class GitHandlerTestCase(unittest.TestCase):
         self.assert_(changes)
         self.assertEqual(new_files, [new_file1, new_file2])
 
-    def test_need_to_push(self):
-        self.assert_(not self.repository.need_to_push())
+    def test_need_push(self):
+        self.assert_(not self.repository.need_push())
         create_file("new")
         self.repository.add("new")
         self.repository.commit("msg")
-        self.assert_(self.repository.need_to_push())
+        self.assert_(self.repository.need_push())
 
     def test_need_merge(self):
         self.assert_(not self.repository.need_merge())

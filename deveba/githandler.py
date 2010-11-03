@@ -46,7 +46,7 @@ class GitRepo(object):
                 new_files.append(name)
         return True, new_files
 
-    def need_to_push(self):
+    def need_push(self):
         out = self.run_git("rev-list", "origin/master..")
         return len(out.strip()) > 0
 
@@ -88,7 +88,7 @@ class GitHandler(Handler):
         self.repo.run_git("merge", "origin/master")
 
     def need_push(self):
-        return self.repo.need_to_push()
+        return self.repo.need_push()
 
     def push(self):
         self.repo.run_git("push")
