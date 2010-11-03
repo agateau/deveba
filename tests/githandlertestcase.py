@@ -53,3 +53,15 @@ class GitHandlerTestCase(unittest.TestCase):
         self.repository.add("new")
         self.repository.commit("msg")
         self.assert_(self.repository.need_to_push())
+
+    def test_need_merge(self):
+        self.assert_(not self.repository.need_merge())
+        other_repo_path = self.sandbox / "other_repo"
+        other_repo = GitRepo.clone(self.origin_repository.path, other_repo_path)
+        create_file(other_repo.path / "new_from_other_repo")
+        other_repo.add("new_from_other_repo")
+        other_repo.commit("commit from other repo")
+        other_repo.run_git("push", "origin", "master:master")
+
+        self.repository.run_git("fetch")
+        self.assert_(self.repository.need_merge())

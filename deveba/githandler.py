@@ -56,40 +56,39 @@ class GitRepo(object):
     def commit(self, msg, *args):
         self.run_git("commit", "-m", msg, *args)
 
+    def need_merge(self):
+        out = self.run_git("rev-list", "..origin/master")
+        return len(out.strip()) > 0
+
 
 class GitHandler(Handler):
-    def work(self, path, proginfo, group):
-        old_cwd = os.getcwd()
-        git = GitRepo(path)
+    def init(self, path, proginfo, group):
+        Handler.init(self, path, proginfo, group)
+        self.repo = GitRepo(path)
+        self.found_changes, self.new_files = self.repo.get_status()
 
-        self._commit(git, proginfo, group)
-        self._pull(git)
-        self._push(git)
-        logging.info("Done")
+    def need_commit(self):
+        return self.found_changes
 
-    def _commit(self, git, proginfo, group):
-        logging.info("Checking for changes")
-        found_changes, new_files = git.get_status()
-        if not found_changes:
-            logging.info("No change found")
-            return False
-        if len(new_files) > 0:
-            git.add(new_files)
+    def commit(self):
+        if len(self.new_files) > 0:
+            self.repo.add(self.new_files)
 
-        msg = "Automatic commit from %s, running on %s (group %s)" % (proginfo.name, proginfo.hostname, group)
-        author = "%s <%s@%s>" % (proginfo.name, proginfo.name, proginfo.hostname)
-        git.commit(msg, "--author", author)
-        logging.info("Committed changes")
+        msg = "Automatic commit from %s, running on %s (group %s)" % (self.proginfo.name, self.proginfo.hostname, self.group)
+        author = "%s <%s@%s>" % (self.proginfo.name, self.proginfo.name, self.proginfo.hostname)
+        self.repo.commit(msg, "--author", author)
 
-        return True
+    def fetch(self):
+        self.repo.run_git("fetch")
 
-    def _pull(self, git):
-        logging.info("Updating copy")
-        git.run_git("pull")
+    def need_merge(self):
+        self.repo.need_merge()
 
-    def _push(self, git):
-        if git.need_to_push():
-            logging.info("Pushing changes")
-            git.run_git("push")
-        else:
-            logging.info("Nothing to push")
+    def merge(self):
+        self.repo.run_git("merge", "origin/master")
+
+    def need_push(self):
+        return self.repo.need_to_push()
+
+    def push(self):
+        self.repo.run_git("push")

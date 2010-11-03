@@ -29,6 +29,20 @@ class Repository(object):
                 return
 
         try:
-            self.handler.work(self.path, proginfo, self.group.name)
+            self.handler.init(self.path, proginfo, self.group.name)
+            if self.handler.need_commit():
+                logging.info("Committing changes")
+                self.handler.commit()
+
+            self.handler.fetch()
+
+            if self.handler.need_merge():
+                logging.info("Merging upstream changes")
+                self.handler.merge()
+
+            if self.handler.need_push():
+                logging.info("Pushing changes")
+                self.handler.push()
+
         except HandlerError, exc:
             logging.error("Failed: %s" % exc)
