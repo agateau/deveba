@@ -6,7 +6,7 @@ from optparse import OptionParser
 from path import path
 
 from config import Config
-from proginfo import ProgInfo
+from proginfo import InteractiveProgInfo, ProgInfo
 
 CONFIG_FILE = "~/.config/deveba/deveba.xml"
 
@@ -36,8 +36,7 @@ def do_list(groups):
         for repo in group.repositories.values():
             print "- %s" % repo
 
-def do_backup(groups):
-    proginfo = ProgInfo()
+def do_backup(groups, proginfo):
     for group in groups:
         logging.info("# Group %s" % group.name)
         group.backup(proginfo)
@@ -61,6 +60,10 @@ def main():
     parser.add_option("--list",
                       action="store_true", dest="list",
                       help="list groups and repositories")
+
+    parser.add_option("-i", "--interactive",
+                      action="store_true", dest="interactive",
+                      help="prompt before actions")
 
     parser.add_option("-a", "--all",
                       action="store_true", dest="all",
@@ -90,7 +93,12 @@ def main():
     else:
         groups = get_group_list(config.groups, args)
 
-    do_backup(groups)
+    if options.interactive:
+        proginfo = InteractiveProgInfo()
+    else:
+        proginfo = ProgInfo()
+
+    do_backup(groups, proginfo)
 
     return 0
 

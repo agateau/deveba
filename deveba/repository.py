@@ -31,16 +31,25 @@ class Repository(object):
         try:
             self.handler.init(self.path, proginfo, self.group.name)
             if self.handler.need_commit():
+                if not proginfo.ok_to_commit():
+                    logging.warning("Cancelled commit")
+                    return
                 logging.info("Committing changes")
                 self.handler.commit()
 
             self.handler.fetch()
 
             if self.handler.need_merge():
+                if not proginfo.ok_to_merge():
+                    logging.warning("Cancelled merge")
+                    return
                 logging.info("Merging upstream changes")
                 self.handler.merge()
 
             if self.handler.need_push():
+                if not proginfo.ok_to_push():
+                    logging.warning("Cancelled push")
+                    return
                 logging.info("Pushing changes")
                 self.handler.push()
 
