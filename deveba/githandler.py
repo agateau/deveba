@@ -50,6 +50,12 @@ class GitRepo(object):
         out = self.run_git("rev-list", "origin/master..")
         return len(out.strip()) > 0
 
+    def add(self, *files):
+        self.run_git("add", *files)
+
+    def commit(self, msg, *args):
+        self.run_git("commit", "-m", msg, *args)
+
 
 class GitHandler(Handler):
     def work(self, path, proginfo, group):
@@ -68,11 +74,11 @@ class GitHandler(Handler):
             logging.info("No change found")
             return False
         if len(new_files) > 0:
-            git.run_git("add", *new_files)
+            git.add(new_files)
 
         msg = "Automatic commit from %s, running on %s (group %s)" % (proginfo.name, proginfo.hostname, group)
         author = "%s <%s@%s>" % (proginfo.name, proginfo.name, proginfo.hostname)
-        git.run_git("commit", "-a", "-m", msg, "--author", author)
+        git.commit(msg, "--author", author)
         logging.info("Committed changes")
 
         return True

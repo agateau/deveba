@@ -20,8 +20,8 @@ def create_repository():
 
     repo = GitRepo.clone(origin_repo.path, sandbox / "repo", "--no-hardlinks")
     create_file(repo.path / "dummy")
-    repo.run_git("add", "dummy")
-    repo.run_git("commit", "-m", "created")
+    repo.add("dummy")
+    repo.commit("created")
     repo.run_git("push", "origin", "master:master")
     return sandbox, origin_repo, repo
 
@@ -37,7 +37,7 @@ class GitHandlerTestCase(unittest.TestCase):
 
     def test_get_status(self):
         create_file("modified")
-        self.repository.run_git("add", "modified")
+        self.repository.add("modified")
         new_file1 = "new"
         new_file2 = "néè"
         create_file(new_file1)
@@ -50,6 +50,6 @@ class GitHandlerTestCase(unittest.TestCase):
     def test_need_to_push(self):
         self.assert_(not self.repository.need_to_push())
         create_file("new")
-        self.repository.run_git("add", "new")
-        self.repository.run_git("commit", "-m", "msg")
+        self.repository.add("new")
+        self.repository.commit("msg")
         self.assert_(self.repository.need_to_push())
