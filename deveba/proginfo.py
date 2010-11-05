@@ -22,7 +22,7 @@ class ProgInfo(object):
 
 def confirm(msg):
     line = raw_input("%s (Yn): " % msg)
-    return line.lower() == "y"
+    return line.lower() == "y" or line == ""
 
 """
 An implementation of ProgInfo which prompts before every changes
