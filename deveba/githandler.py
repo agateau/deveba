@@ -76,7 +76,7 @@ class GitHandler(Handler):
 
         msg = "Automatic commit from %s, running on %s (group %s)" % (self.proginfo.name, self.proginfo.hostname, self.group)
         author = "%s <%s@%s>" % (self.proginfo.name, self.proginfo.name, self.proginfo.hostname)
-        self.repo.commit(msg, "--author", author)
+        self.repo.commit(msg, "-a", "--author", author)
 
     def fetch(self):
         self.repo.run_git("fetch")
