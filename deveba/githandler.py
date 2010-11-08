@@ -72,7 +72,7 @@ class GitHandler(Handler):
 
     def commit(self):
         if len(self.new_files) > 0:
-            self.repo.add(self.new_files)
+            self.repo.add(*self.new_files)
 
         msg = "Automatic commit from %s, running on %s (group %s)" % (self.proginfo.name, self.proginfo.hostname, self.group)
         author = "%s <%s@%s>" % (self.proginfo.name, self.proginfo.name, self.proginfo.hostname)

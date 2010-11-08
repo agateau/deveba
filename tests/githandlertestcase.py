@@ -5,6 +5,7 @@ import unittest
 
 from path import path
 
+from proginfo import ProgInfo
 from githandler import GitRepo, GitHandler
 
 def create_file(name):
@@ -25,7 +26,7 @@ def create_repository():
     repo.run_git("push", "origin", "master:master")
     return sandbox, origin_repo, repo
 
-class GitHandlerTestCase(unittest.TestCase):
+class GitRepoTestCase(unittest.TestCase):
     def setUp(self):
         self.old_cwd = os.getcwd()
         self.sandbox, self.origin_repository, self.repository = create_repository()
@@ -65,3 +66,30 @@ class GitHandlerTestCase(unittest.TestCase):
 
         self.repository.run_git("fetch")
         self.assert_(self.repository.need_merge())
+
+
+class GitHandlerTestCase(unittest.TestCase):
+    def setUp(self):
+        self.old_cwd = os.getcwd()
+        self.sandbox, self.origin_repository, self.repository = create_repository()
+        os.chdir(self.repository.path)
+
+    def create_test_handler(self):
+        proginfo = ProgInfo()
+        handler = GitHandler()
+        handler.init(self.repository.path, proginfo, "unit-test-group")
+        return handler
+
+    def tearDown(self):
+        os.chdir(self.old_cwd)
+        self.sandbox.rmtree()
+
+    def test_commit(self):
+        create_file("new")
+
+        handler = self.create_test_handler()
+        self.assert_(handler.need_commit())
+        handler.commit()
+
+        changes, new_files = self.repository.get_status()
+        self.assert_(not changes)
