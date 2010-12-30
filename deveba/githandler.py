@@ -67,7 +67,7 @@ class GitHandler(Handler):
     __slots__ = ["repo"]
 
     @classmethod
-    def can_handle(self, path):
+    def can_handle(cls, path):
         return (path / ".git").exists()
 
     def backup(self, proginfo):

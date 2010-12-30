@@ -10,9 +10,9 @@ class Handler(object):
     __slots__ = ["path", "group"]
 
     @classmethod
-    def can_handle(self, path):
+    def can_handle(cls, path):
         """
-        Must return True if it can handle the repository in path
+        Must return True if this class can handle the content of 'path'
         """
         raise NotImplementedError
 

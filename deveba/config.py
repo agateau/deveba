@@ -3,12 +3,14 @@ import xml.etree.ElementTree as etree
 from path import path
 
 from group import Group
-from githandler import GitHandler
 
 class ParseError(Exception):
     pass
 
 class Config(object):
+    """
+    Parse config and instantiate repository handlers, based on its registered handlers
+    """
     __slots__ = ["groups", "handler_classes"]
     def __init__(self):
         self.groups = {}
