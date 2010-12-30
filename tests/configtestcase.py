@@ -7,6 +7,7 @@ from StringIO import StringIO
 from path import path
 
 from config import Config
+from repository import Repository
 
 TEST_CONFIG="""
 <config>
@@ -20,9 +21,15 @@ TEST_CONFIG="""
 </config>
 """
 
+class TestRepository(Repository):
+    @classmethod
+    def can_handle(self, path):
+        return True
+
 class ConfigTestCase(unittest.TestCase):
     def test_parse(self):
         config = Config()
+        config.add_repository_class(TestRepository)
         fp = StringIO(TEST_CONFIG)
         config.parsefp(fp)
 

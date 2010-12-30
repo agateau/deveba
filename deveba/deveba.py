@@ -7,6 +7,7 @@ from path import path
 
 from config import Config
 from proginfo import InteractiveProgInfo, ProgInfo
+from gitrepository import GitRepository
 
 CONFIG_FILE = "~/.config/deveba/deveba.xml"
 
@@ -39,7 +40,9 @@ def do_list(groups):
 def do_backup(groups, proginfo):
     for group in groups:
         logging.info("# Group %s" % group.name)
-        group.backup(proginfo)
+        for repo in group.repositories.values():
+            logging.info("Starting work on %s" % repo.path)
+            repo.backup(proginfo)
 
 def get_group_list(all_groups, names):
     groups = []
@@ -82,6 +85,7 @@ def main():
     setup_logger(options.log, options.quiet)
 
     config = Config()
+    config.add_repository_class(GitRepository)
     config.parse(path(options.config).expanduser())
 
     if options.list:

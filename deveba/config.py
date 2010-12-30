@@ -3,15 +3,19 @@ import xml.etree.ElementTree as etree
 from path import path
 
 from group import Group
-from repository import Repository
+from gitrepository import GitRepository
 
 class ParseError(Exception):
     pass
 
 class Config(object):
-    __slots__ = ["groups"]
+    __slots__ = ["groups", "repository_classes"]
     def __init__(self):
         self.groups = {}
+        self.repository_classes = []
+
+    def add_repository_class(self, klass):
+        self.repository_classes.append(klass)
 
     def parse(self, name):
         self.parsefp(file(name))
@@ -32,9 +36,16 @@ class Config(object):
             self._parse_repo(group, repo_element)
 
     def _parse_repo(self, group, repo_element):
-        repo = Repository()
-        repo.path = path(repo_element.get("path")).expanduser()
-        if repo.path is None:
+        repo_path = path(repo_element.get("path")).expanduser()
+        if repo_path is None:
             raise ParseError("Missing 'path' attribute in repository")
+
+        for repo_class in self.repository_classes:
+            if repo_class.can_handle(repo_path):
+                repo = repo_class()
+                break
+        else:
+            raise ParseError("Don't know how to handle directory '%s'" % repo_path)
+        repo.path = repo_path
         repo.group = group
         group.repositories[repo.path] = repo
