@@ -64,7 +64,7 @@ def main():
                       dest="log", default="-",
                       help="write log to FILE", metavar="FILE")
 
-    parser.add_option("--list",
+    parser.add_option("-l", "--list",
                       action="store_true", dest="list",
                       help="list groups and repositories")
 
