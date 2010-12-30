@@ -7,7 +7,8 @@ from path import path
 
 from config import Config
 from proginfo import InteractiveProgInfo, ProgInfo
-from gitrepository import GitRepository
+from handler import HandlerError
+from githandler import GitHandler
 
 CONFIG_FILE = "~/.config/deveba/deveba.xml"
 
@@ -34,15 +35,18 @@ def setup_logger(name, quiet):
 def do_list(groups):
     for group in groups:
         print group
-        for repo in group.repositories.values():
-            print "- %s" % repo
+        for handler in group.handlers.values():
+            print "- %s" % handler
 
 def do_backup(groups, proginfo):
     for group in groups:
         logging.info("# Group %s" % group.name)
-        for repo in group.repositories.values():
-            logging.info("Starting work on %s" % repo.path)
-            repo.backup(proginfo)
+        for handler in group.handlers.values():
+            logging.info("Starting work on %s" % handler.path)
+            try:
+                handler.backup(proginfo)
+            except HandlerError, exc:
+                logging.error("Failed: %s" % exc)
 
 def get_group_list(all_groups, names):
     groups = []
@@ -85,7 +89,7 @@ def main():
     setup_logger(options.log, options.quiet)
 
     config = Config()
-    config.add_repository_class(GitRepository)
+    config.add_handler_class(GitHandler)
     config.parse(path(options.config).expanduser())
 
     if options.list:

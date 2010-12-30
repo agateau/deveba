@@ -3,11 +3,11 @@ import logging
 
 from shell import shell
 
-from repository import Repository, RepositoryError
+from handler import Handler, HandlerError
 
 class GitRepo(object):
     """
-    A low-level abstraction for a git repository
+    Helper class to run git commands
     """
     __slots__ = ["path"]
     def __init__(self, path):
@@ -17,7 +17,7 @@ class GitRepo(object):
     def _run_git(*args):
         result = shell.git(*args)
         if result.returncode != 0:
-            raise RepositoryError(result.stderr.strip())
+            raise HandlerError(result.stderr.strip())
         return result.stdout
 
     def run_git(self, *args):
@@ -63,7 +63,7 @@ class GitRepo(object):
         out = self.run_git("rev-list", "..origin/master")
         return len(out.strip()) > 0
 
-class GitRepository(Repository):
+class GitHandler(Handler):
     __slots__ = ["repo"]
 
     @classmethod

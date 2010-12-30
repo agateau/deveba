@@ -6,7 +6,7 @@ import unittest
 from path import path
 
 from proginfo import ProgInfo
-from gitrepository import GitRepo, GitRepository
+from githandler import GitRepo, GitHandler
 
 def create_file(name):
     path(name).touch()
@@ -68,15 +68,14 @@ class GitRepoTestCase(unittest.TestCase):
         self.assert_(self.repository.need_merge())
 
 
-class GitRepositoryTestCase(unittest.TestCase):
+class GitHandlerTestCase(unittest.TestCase):
     def setUp(self):
         self.old_cwd = os.getcwd()
         self.sandbox, self.origin_repository, self.repository = create_repository()
         os.chdir(self.repository.path)
 
     def create_test_handler(self):
-        proginfo = ProgInfo()
-        handler = GitRepository()
+        handler = GitHandler()
         handler.path = self.repository.path
         return handler
 

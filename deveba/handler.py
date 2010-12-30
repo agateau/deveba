@@ -1,11 +1,11 @@
 from path import path
 
-class RepositoryError(Exception):
+class HandlerError(Exception):
     pass
 
-class Repository(object):
+class Handler(object):
     """
-    Base class for repositories
+    Base class for repository handlers
     """
     __slots__ = ["path", "group"]
 

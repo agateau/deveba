@@ -1,9 +1,9 @@
 class Group(object):
-    __slots__ = ["name", "repositories"]
+    __slots__ = ["name", "handlers"]
 
     def __init__(self):
         self.name = ""
-        self.repositories = {}
+        self.handlers = {}
 
     def __str__(self):
         return self.name
