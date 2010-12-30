@@ -1,5 +1,8 @@
 from path import path
 
+class RepositoryError(Exception):
+    pass
+
 class Repository(object):
     """
     Base class for repositories

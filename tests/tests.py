@@ -4,7 +4,7 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, "deveba"))
 
-from githandlertestcase import GitHandlerTestCase
+from gitrepositorytestcase import GitRepoTestCase, GitRepositoryTestCase
 from configtestcase import ConfigTestCase
 
 def main():
