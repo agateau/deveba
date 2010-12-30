@@ -44,10 +44,10 @@ class GitRepoTestCase(unittest.TestCase):
         create_file(new_file1)
         create_file(new_file2)
 
-        changes, modified_files, new_files = self.repository.get_status()
-        self.assert_(changes)
-        self.assertEqual(modified_files, ["modified"])
-        self.assertEqual(new_files, [new_file1, new_file2])
+        status = self.repository.get_status()
+        self.assert_(status.has_changes())
+        self.assertEqual(status.modified_files, ["modified"])
+        self.assertEqual(status.new_files, [new_file1, new_file2])
 
     def test_need_push(self):
         self.assert_(not self.repository.need_push())
@@ -108,10 +108,9 @@ class GitHandlerTestCase(unittest.TestCase):
 
         diff = self.repository.run_git("diff")
 
-        changes, modified_files, new_files = self.repository.get_status()
-        self.assertEqual(modified_files, ["modified"])
-        self.assertEqual(new_files, ["new"])
-        self.assert_(changes)
+        status = self.repository.get_status()
+        self.assertEqual(status.modified_files, ["modified"])
+        self.assertEqual(status.new_files, ["new"])
 
         handler = self.create_test_handler()
         ui = TestUserInterface()
@@ -119,8 +118,8 @@ class GitHandlerTestCase(unittest.TestCase):
         ui.add_question_answer("Commit")
         handler.backup(ui)
 
-        changes, modified_files, new_files = self.repository.get_status()
-        self.assert_(not changes)
+        status = self.repository.get_status()
+        self.assert_(not status.has_changes())
 
         self.assertEqual(ui.show_text_calls.pop(0), "Modified files:\n- modified\n\nNew files:\n- new\n")
         self.assertEqual(ui.show_text_calls.pop(0), diff)

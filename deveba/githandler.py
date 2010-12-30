@@ -6,6 +6,19 @@ from shell import shell
 import utils
 from handler import Handler, HandlerError
 
+class GitStatus(object):
+    """
+    Represents the status of a GitRepo (modified and added files...)
+    """
+    __slots__ = ["modified_files", "new_files"]
+
+    def __init__(self):
+        self.modified_files = []
+        self.new_files = []
+
+    def has_changes(self):
+        return bool(self.modified_files) or bool(self.new_files)
+
 class GitRepo(object):
     """
     Helper class to run git commands
@@ -42,19 +55,14 @@ class GitRepo(object):
                 name = eval(name)
             return name
 
-        status = set()
+        status = GitStatus()
         out = self.run_git("status", "--porcelain")
-        if out == '':
-            return False, [], []
-
-        new_files = []
-        modified_files = []
         for line in out.splitlines():
             if line.startswith("??"):
-                new_files.append(clean_line(line))
+                status.new_files.append(clean_line(line))
             else:
-                modified_files.append(clean_line(line))
-        return True, modified_files, new_files
+                status.modified_files.append(clean_line(line))
+        return status
 
     def need_push(self):
         out = self.run_git("rev-list", "origin/master..")
@@ -82,18 +90,18 @@ class GitHandler(Handler):
             return "\n".join("- " + x for x in lst)
 
         self.repo = GitRepo(self.path)
-        found_changes, modified_files, new_files = self.repo.get_status()
+        status = self.repo.get_status()
 
-        if found_changes:
+        if status.has_changes():
             while True:
                 ui.show_text("Modified files:\n%s\n\nNew files:\n%s\n"
-                    % (format_list(modified_files), format_list(new_files))
+                    % (format_list(status.modified_files), format_list(status.new_files))
                     )
                 choices = ["Commit", "Show Diff"]
                 answer = ui.question("Uncommitted changes detected", choices, "Commit")
                 if answer == "Commit":
                     logging.info("Committing changes")
-                    self._commit(new_files)
+                    self._commit(status.new_files)
                     break
                 elif answer == "Show Diff":
                     ui.show_text(self.repo.run_git("diff"))
