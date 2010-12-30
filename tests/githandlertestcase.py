@@ -44,8 +44,9 @@ class GitRepoTestCase(unittest.TestCase):
         create_file(new_file1)
         create_file(new_file2)
 
-        changes, new_files = self.repository.get_status()
+        changes, modified_files, new_files = self.repository.get_status()
         self.assert_(changes)
+        self.assertEqual(modified_files, ["modified"])
         self.assertEqual(new_files, [new_file1, new_file2])
 
     def test_need_push(self):
@@ -68,6 +69,21 @@ class GitRepoTestCase(unittest.TestCase):
         self.assert_(self.repository.need_merge())
 
 
+class TestUserInterface(SilentUserInterface):
+    def __init__(self):
+        self.show_text_calls = []
+        self.question_answers = []
+
+    def add_question_answer(self, answer):
+        self.question_answers.append(answer)
+
+    def show_text(self, text):
+        self.show_text_calls.append(text)
+
+    def question(self, msg, choices, default):
+        return self.question_answers.pop(0)
+
+
 class GitHandlerTestCase(unittest.TestCase):
     def setUp(self):
         self.old_cwd = os.getcwd()
@@ -83,14 +99,29 @@ class GitHandlerTestCase(unittest.TestCase):
         os.chdir(self.old_cwd)
         self.sandbox.rmtree()
 
-    def test_backup_new_file(self):
+    def test_backup(self):
         create_file("new")
+        create_file("modified")
+        self.repository.add("modified")
+        self.repository.commit("commit")
+        open("modified", "w").write("Foo")
 
-        changes, new_files = self.repository.get_status()
+        diff = self.repository.run_git("diff")
+
+        changes, modified_files, new_files = self.repository.get_status()
+        self.assertEqual(modified_files, ["modified"])
+        self.assertEqual(new_files, ["new"])
         self.assert_(changes)
 
         handler = self.create_test_handler()
-        handler.backup(SilentUserInterface())
+        ui = TestUserInterface()
+        ui.add_question_answer("Show Diff")
+        ui.add_question_answer("Commit")
+        handler.backup(ui)
 
-        changes, new_files = self.repository.get_status()
+        changes, modified_files, new_files = self.repository.get_status()
         self.assert_(not changes)
+
+        self.assertEqual(ui.show_text_calls.pop(0), "Modified files:\n- modified\n\nNew files:\n- new\n")
+        self.assertEqual(ui.show_text_calls.pop(0), diff)
+
