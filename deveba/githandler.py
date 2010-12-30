@@ -70,12 +70,12 @@ class GitHandler(Handler):
     def can_handle(cls, path):
         return (path / ".git").exists()
 
-    def backup(self, proginfo):
+    def backup(self, proginfo, ui):
         self.repo = GitRepo(self.path)
         found_changes, new_files = self.repo.get_status()
 
         if found_changes:
-            if not proginfo.ok_to_commit():
+            if not ui.confirm("Uncommitted changes detected, commit them?", True):
                 logging.warning("Cancelled commit")
                 return
             logging.info("Committing changes")
@@ -84,14 +84,14 @@ class GitHandler(Handler):
         self.repo.run_git("fetch")
 
         if self.repo.need_merge():
-            if not proginfo.ok_to_merge():
+            if not ui.confirm("Upstream changes fetched, merge them?", True):
                 logging.warning("Cancelled merge")
                 return
             logging.info("Merging upstream changes")
             self.repo.run_git("merge", "origin/master")
 
         if self.repo.need_push():
-            if not proginfo.ok_to_push():
+            if not ui.confirm("Local changes not pushed, push them?", True):
                 logging.warning("Cancelled push")
                 return
             logging.info("Pushing changes")
