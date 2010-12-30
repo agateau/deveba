@@ -3,6 +3,7 @@ import logging
 
 from shell import shell
 
+import utils
 from handler import Handler, HandlerError
 
 class GitRepo(object):
@@ -70,7 +71,7 @@ class GitHandler(Handler):
     def can_handle(cls, path):
         return (path / ".git").exists()
 
-    def backup(self, proginfo, ui):
+    def backup(self, ui):
         self.repo = GitRepo(self.path)
         found_changes, new_files = self.repo.get_status()
 
@@ -79,7 +80,7 @@ class GitHandler(Handler):
                 logging.warning("Cancelled commit")
                 return
             logging.info("Committing changes")
-            self._commit(proginfo, new_files)
+            self._commit(new_files)
 
         self.repo.run_git("fetch")
 
@@ -97,10 +98,10 @@ class GitHandler(Handler):
             logging.info("Pushing changes")
             self.repo.run_git("push")
 
-    def _commit(self, proginfo, new_files):
+    def _commit(self, new_files):
         if len(new_files) > 0:
             self.repo.add(*new_files)
 
-        msg = "Automatic commit from %s, running on %s (group %s)" % (proginfo.name, proginfo.hostname, self.group)
-        author = "%s <%s@%s>" % (proginfo.name, proginfo.name, proginfo.hostname)
+        msg = utils.generate_commit_message(self.group)
+        author = "%s <%s>" % (utils.get_commit_author_name(), utils.get_commit_author_email())
         self.repo.commit(msg, "-a", "--author", author)

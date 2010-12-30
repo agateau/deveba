@@ -6,7 +6,6 @@ from optparse import OptionParser
 from path import path
 
 from config import Config
-from proginfo import ProgInfo
 from userinterface import InteractiveUserInterface, SilentUserInterface
 from handler import HandlerError
 from githandler import GitHandler
@@ -39,13 +38,13 @@ def do_list(groups):
         for handler in group.handlers.values():
             print "- %s" % handler
 
-def do_backup(groups, proginfo, ui):
+def do_backup(groups, ui):
     for group in groups:
         logging.info("# Group %s" % group.name)
         for handler in group.handlers.values():
             logging.info("Starting work on %s" % handler.path)
             try:
-                handler.backup(proginfo, ui)
+                handler.backup(ui)
             except HandlerError, exc:
                 logging.error("Failed: %s" % exc)
 
@@ -107,7 +106,7 @@ def main():
     else:
         ui = SilentUserInterface()
 
-    do_backup(groups, ProgInfo(), ui)
+    do_backup(groups, ui)
 
     return 0
 

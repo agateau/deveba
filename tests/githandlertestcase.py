@@ -5,7 +5,6 @@ import unittest
 
 from path import path
 
-from proginfo import ProgInfo
 from userinterface import SilentUserInterface
 from githandler import GitRepo, GitHandler
 
@@ -91,7 +90,7 @@ class GitHandlerTestCase(unittest.TestCase):
         self.assert_(changes)
 
         handler = self.create_test_handler()
-        handler.backup(ProgInfo(), SilentUserInterface())
+        handler.backup(SilentUserInterface())
 
         changes, new_files = self.repository.get_status()
         self.assert_(not changes)
