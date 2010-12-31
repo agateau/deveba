@@ -31,7 +31,14 @@ class GitRepo(object):
     def _run_git(*args):
         result = shell.git(*args)
         if result.returncode != 0:
-            raise HandlerError(result.stderr.strip())
+            out = result.stdout.strip()
+            err = result.stderr.strip()
+            msg = []
+            if out:
+                msg.append("stdout: %s" % out)
+            if err:
+                msg.append("stderr: %s" % err)
+            raise HandlerError("\n".join(msg))
         return result.stdout
 
     def run_git(self, *args):
