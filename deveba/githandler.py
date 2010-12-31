@@ -4,7 +4,7 @@ import logging
 from shell import shell
 
 import utils
-from handler import Handler, HandlerError
+from handler import Handler, HandlerError, HandlerConflictError
 
 class GitStatus(object):
     """
@@ -98,6 +98,18 @@ class GitRepo(object):
         out = self.run_git("rev-list", "..origin/master")
         return len(out.strip()) > 0
 
+    def merge(self, remote):
+        try:
+            self.run_git("merge", remote)
+        except HandlerError, exc:
+            status = self.get_status()
+            if status.conflicting_files:
+                # Merge failed because of a conflict, raise HandlerConflictError
+                raise HandlerConflictError(status.conflicting_files)
+            else:
+                # Something else happened
+                raise exc
+
 class GitHandler(Handler):
     __slots__ = ["repo"]
 
@@ -136,7 +148,7 @@ class GitHandler(Handler):
                 logging.warning("Cancelled merge")
                 return
             logging.info("Merging upstream changes")
-            self.repo.run_git("merge", "origin/master")
+            self.repo.merge("origin/master")
 
         if self.repo.need_push():
             if not ui.confirm("Local changes not pushed, push them?", True):

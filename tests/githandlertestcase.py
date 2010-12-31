@@ -6,6 +6,7 @@ import unittest
 from path import path
 
 from userinterface import SilentUserInterface
+from handler import HandlerConflictError
 from githandler import GitRepo, GitHandler
 
 def create_file(name):
@@ -48,6 +49,39 @@ class GitRepoTestCase(unittest.TestCase):
         self.assert_(status.has_changes())
         self.assertEqual(status.modified_files, ["modified"])
         self.assertEqual(status.new_files, [new_file1, new_file2])
+
+    def test_merge_conflict(self):
+        # Create a file and push it
+        conflict = "conflict"
+        open(conflict, "w").write("Foo")
+        self.repository.add(conflict)
+        self.repository.commit("msg")
+        self.repository.run_git("push", "origin", "master:master")
+
+        # Clone the repository and modify 'conflict'
+        repo2_path = self.sandbox / "repo2"
+        repo2 = GitRepo.clone(self.origin_repository.path, repo2_path)
+        open(repo2_path / "conflict", "w").write("Repo2")
+        repo2.add(conflict)
+        repo2.commit("msg")
+
+        # Push to remote repository
+        repo2.run_git("push", "origin", "master:master")
+
+        # Modify 'conflict' in self.repository
+        open(conflict, "w").write("Local")
+        self.repository.add(conflict)
+        self.repository.commit("msg2")
+
+        # Try to merge
+        self.repository.run_git("fetch")
+        try:
+            self.repository.merge("origin/master")
+        except HandlerConflictError, exc:
+            self.assertEqual(exc.conflicting_files, ["conflict"])
+        else:
+            self.fail("Expected a GitMergeError")
+
 
     def test_need_push(self):
         self.assert_(not self.repository.need_push())
