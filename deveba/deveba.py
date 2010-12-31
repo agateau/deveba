@@ -5,6 +5,8 @@ from optparse import OptionParser
 
 from path import path
 
+import lognotify
+
 from config import Config
 from userinterface import InteractiveUserInterface, SilentUserInterface
 from handler import HandlerError
@@ -31,6 +33,10 @@ def setup_logger(name, quiet):
     args["format"] = "%(levelname)s: %(asctime)s: %(message)s"
 
     logging.basicConfig(**args)
+
+    handler = lognotify.create_handler()
+    if handler:
+        logging.getLogger().addHandler(handler)
 
 def do_list(groups):
     for group in groups:
