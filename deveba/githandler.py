@@ -48,20 +48,17 @@ class GitRepo(object):
         return GitRepo(repository_path)
 
     def get_status(self):
-        def clean_line(line):
-            name = line[3:]
-            if name.startswith('"'):
-                # FIXME: Dangerous?
-                name = eval(name)
-            return name
-
         status = GitStatus()
-        out = self.run_git("status", "--porcelain")
-        for line in out.splitlines():
-            if line.startswith("??"):
-                status.new_files.append(clean_line(line))
+        out = self.run_git("status", "--porcelain", "-z")
+        for line in out.split("\0"):
+            if len(line) == 0:
+                continue
+            state = line[:2]
+            name = line[3:]
+            if state == "??":
+                status.new_files.append(name)
             else:
-                status.modified_files.append(clean_line(line))
+                status.modified_files.append(name)
         return status
 
     def need_push(self):
