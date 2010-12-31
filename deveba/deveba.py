@@ -46,13 +46,13 @@ def do_list(groups):
 
 def do_backup(groups, ui):
     for group in groups:
-        logging.info("# Group %s" % group.name)
         for handler in group.handlers.values():
-            logging.info("Starting work on %s" % handler.path)
+            logging.info("Synchronizing %s" % handler.path)
             try:
                 handler.backup(ui)
             except HandlerError, exc:
                 logging.error("Failed: %s" % exc)
+    logging.info("Done")
 
 def get_group_list(all_groups, names):
     groups = []
