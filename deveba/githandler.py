@@ -8,16 +8,42 @@ from handler import Handler, HandlerError
 
 class GitStatus(object):
     """
-    Represents the status of a GitRepo (modified and added files...)
+    Parses the output of git status --porcelain -z into usable fields
     """
-    __slots__ = ["modified_files", "new_files"]
+    __slots__ = ["modified_files", "new_files", "conflicting_files"]
 
-    def __init__(self):
+    def __init__(self, out):
+        """
+        out is the output of `git status --porcelain -z`
+        """
+
+        CONFLICT_STATES = [
+            "DD",
+            "AU",
+            "UD",
+            "UA",
+            "DU",
+            "AA",
+            "UU",
+            ]
         self.modified_files = []
         self.new_files = []
+        self.conflicting_files = []
+
+        for line in out.split("\0"):
+            if len(line) == 0:
+                continue
+            state = line[:2]
+            name = line[3:]
+            if state == "??":
+                self.new_files.append(name)
+            elif state in CONFLICT_STATES:
+                self.conflicting_files.append(name)
+            else:
+                self.modified_files.append(name)
 
     def has_changes(self):
-        return bool(self.modified_files) or bool(self.new_files)
+        return bool(self.modified_files) or bool(self.new_files) or bool(self.conflicting_files)
 
 class GitRepo(object):
     """
@@ -55,18 +81,8 @@ class GitRepo(object):
         return GitRepo(repository_path)
 
     def get_status(self):
-        status = GitStatus()
         out = self.run_git("status", "--porcelain", "-z")
-        for line in out.split("\0"):
-            if len(line) == 0:
-                continue
-            state = line[:2]
-            name = line[3:]
-            if state == "??":
-                status.new_files.append(name)
-            else:
-                status.modified_files.append(name)
-        return status
+        return GitStatus(out)
 
     def need_push(self):
         out = self.run_git("rev-list", "origin/master..")
