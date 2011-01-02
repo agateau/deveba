@@ -33,5 +33,5 @@ class Handler(object):
     def __str__(self):
         return self.path
 
-    def backup(self, ui):
+    def sync(self, ui):
         raise NotImplementedError

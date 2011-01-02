@@ -133,7 +133,7 @@ class GitHandlerTestCase(unittest.TestCase):
         os.chdir(self.old_cwd)
         self.sandbox.rmtree()
 
-    def test_backup(self):
+    def test_sync(self):
         create_file("new")
         create_file("modified")
         self.repository.add("modified")
@@ -150,7 +150,7 @@ class GitHandlerTestCase(unittest.TestCase):
         ui = TestUserInterface()
         ui.add_question_answer("Show Diff")
         ui.add_question_answer("Commit")
-        handler.backup(ui)
+        handler.sync(ui)
 
         status = self.repository.get_status()
         self.assert_(not status.has_changes())

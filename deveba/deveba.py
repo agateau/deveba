@@ -44,12 +44,12 @@ def do_list(groups):
         for handler in group.handlers.values():
             print "- %s" % handler
 
-def do_backup(groups, ui):
+def do_sync(groups, ui):
     for group in groups:
         for handler in group.handlers.values():
             logging.info("Synchronizing %s" % handler.path)
             try:
-                handler.backup(ui)
+                handler.sync(ui)
             except HandlerError, exc:
                 logging.error("Failed: %s" % exc)
     logging.info("Done")
@@ -113,7 +113,7 @@ def main():
         ui = SilentUserInterface()
 
     if groups:
-        do_backup(groups, ui)
+        do_sync(groups, ui)
     else:
         logging.error("Nothing to synchronize")
 

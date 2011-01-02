@@ -117,7 +117,7 @@ class GitHandler(Handler):
     def can_handle(cls, path):
         return (path / ".git").exists()
 
-    def backup(self, ui):
+    def sync(self, ui):
         def format_list(lst):
             return "\n".join("- " + x for x in lst)
 
