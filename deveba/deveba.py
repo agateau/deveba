@@ -112,7 +112,10 @@ def main():
     else:
         ui = SilentUserInterface()
 
-    do_backup(groups, ui)
+    if groups:
+        do_backup(groups, ui)
+    else:
+        logging.error("Nothing to synchronize")
 
     return 0
 
