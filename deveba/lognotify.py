@@ -1,4 +1,7 @@
 import logging
+
+import glib
+
 try:
     import pynotify
     HAS_PYNOTIFY = True
@@ -9,8 +12,11 @@ except ImportError:
 class LogNotifyHandler(logging.Handler):
     def __init__(self, level=logging.NOTSET):
         logging.Handler.__init__(self, level)
+        self.enabled = True
 
     def emit(self, record):
+        if not self.enabled:
+            return False
         if record.levelno <= logging.INFO:
             icon = "dialog-information"
         elif record.levelno <= logging.WARNING:
@@ -18,7 +24,11 @@ class LogNotifyHandler(logging.Handler):
         else:
             icon = "dialog-error"
         notification = pynotify.Notification("Deveba", record.getMessage(), icon)
-        notification.show()
+        try:
+            notification.show()
+        except glib.GError:
+            print "Failed to show notification, disabling LogNotifyHandler"
+            self.enabled = False
 
 def create_handler():
     if not HAS_PYNOTIFY:
