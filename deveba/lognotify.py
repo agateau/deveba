@@ -1,8 +1,7 @@
 import logging
 
-import glib
-
 try:
+    import glib
     import pynotify
     HAS_PYNOTIFY = True
 except ImportError:
