@@ -9,8 +9,9 @@ except ImportError:
 
 
 class LogNotifyHandler(logging.Handler):
-    def __init__(self, level=logging.NOTSET):
+    def __init__(self, appname, level=logging.NOTSET):
         logging.Handler.__init__(self, level)
+        pynotify.init(appname)
         self.enabled = True
 
     def emit(self, record):
@@ -29,8 +30,8 @@ class LogNotifyHandler(logging.Handler):
             print "Failed to show notification, disabling LogNotifyHandler"
             self.enabled = False
 
-def create_handler():
+def create_handler(appname):
     if not HAS_PYNOTIFY:
         return None
 
-    return LogNotifyHandler()
+    return LogNotifyHandler(appname)

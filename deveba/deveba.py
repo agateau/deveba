@@ -34,7 +34,7 @@ def setup_logger(name, quiet):
 
     logging.basicConfig(**args)
 
-    handler = lognotify.create_handler()
+    handler = lognotify.create_handler("deveba")
     if handler:
         logging.getLogger().addHandler(handler)
 
