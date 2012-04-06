@@ -17,7 +17,7 @@ class Handler(object):
     """
     Base class for repository handlers
     """
-    __slots__ = ["path", "group"]
+    __slots__ = ["path", "group", "options"]
 
     @classmethod
     def can_handle(cls, path):
@@ -29,9 +29,13 @@ class Handler(object):
     def __init__(self):
         self.path = path()
         self.group = None
+        self.options = {}
 
     def __str__(self):
-        return self.path
+        txt = self.path
+        if self.options:
+            txt += " (%s)" % self.options
+        return txt
 
     def sync(self, ui):
         raise NotImplementedError

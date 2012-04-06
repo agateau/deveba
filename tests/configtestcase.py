@@ -17,6 +17,7 @@ TEST_CONFIG="""
   </group>
   <group name="manual">
     <repo path="~/manual"/>
+    <repo path="/opt" opt1="foo" opt2="bar"/>
   </group>
 </config>
 """
@@ -43,9 +44,16 @@ class ConfigTestCase(unittest.TestCase):
         self.assert_("/daily2" in group.handlers)
 
         group = config.groups["manual"]
-        repo_path = path("~/manual").expanduser()
-        self.assertEqual(len(group.handlers), 1)
-        self.assert_(repo_path in group.handlers)
+        home_path = path("~/manual").expanduser()
+        opt_path = "/opt"
+        self.assertEqual(len(group.handlers), 2)
+        self.assert_(home_path in group.handlers)
+        self.assert_(opt_path in group.handlers)
 
-        handler = group.handlers[repo_path]
+        # Check home_path
+        handler = group.handlers[home_path]
         self.assertEqual(handler.path.__class__, path)
+
+        # Check opt_path
+        handler = group.handlers[opt_path]
+        self.assertEqual(handler.options, {"opt1":"foo", "opt2":"bar"})

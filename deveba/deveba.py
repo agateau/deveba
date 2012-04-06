@@ -11,6 +11,7 @@ from config import Config
 from userinterface import InteractiveUserInterface, SilentUserInterface
 from handler import HandlerError
 from githandler import GitHandler
+from unisonhandler import UnisonHandler
 
 CONFIG_FILE = "~/.config/deveba/deveba.xml"
 
@@ -96,6 +97,7 @@ def main():
 
     config = Config()
     config.add_handler_class(GitHandler)
+    config.add_handler_class(UnisonHandler)
     config.parse(path(options.config).expanduser())
 
     if options.list:

@@ -50,4 +50,7 @@ class Config(object):
             raise ParseError("Don't know how to handle directory '%s'" % repo_path)
         handler.path = repo_path
         handler.group = group
+        options = dict(repo_element.attrib)
+        del options["path"]
+        handler.options = options
         group.handlers[handler.path] = handler
