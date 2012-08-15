@@ -35,7 +35,7 @@ class UserInterface(object):
                     handler.sync(self)
                 except HandlerError, exc:
                     self.log(self.LOG_ERROR, "Failed: %s" % exc)
-        logging.info("Done")
+        self.log(self.LOG_INFO, "Done")
 
 
 class TextUserInterface(UserInterface):
