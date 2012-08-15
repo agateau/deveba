@@ -31,5 +31,5 @@ class UnisonHandler(Handler):
         profile = profile_for_path(self.path)
         result = cmd("-ui", "text", "-terse", "-batch", profile)
         if result.returncode != 0:
-            raise Exception("unison failed with errorcode %d.\n%s" % \
+            raise HandlerError("unison failed with errorcode %d.\n%s" % \
                 (result.returncode, result.stderr))
