@@ -43,6 +43,7 @@ class SniUserInterface(QObject, UserInterface):
     def log(self, level, msg):
         # This method is called in WorkerThread, we need to switch to the GUI thread first
         self.log_called.emit(level, msg)
+        UserInterface.log(self, level, msg)
 
     @pyqtSlot(QString)
     def do_log(self, level, msg):
