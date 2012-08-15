@@ -1,0 +1,5 @@
+<config>
+  <group name="test">
+    <repo path="@CLIENT_REPO@"/>
+  </group>
+</config>
