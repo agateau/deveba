@@ -1,11 +1,7 @@
-import os
-import logging
-
 from path import path
 from shell import Command
 
-import utils
-from handler import Handler, HandlerError, HandlerConflictError
+from handler import Handler, HandlerError
 
 def profile_for_path(path):
     if not path.startswith("unison:"):
