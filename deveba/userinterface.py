@@ -3,9 +3,9 @@ from handler import HandlerError
 
 class UserInterface(object):
     CANCEL = "Cancel"
-    LOG_ERROR = 1
+    LOG_VERBOSE = 1
     LOG_INFO = 2
-    LOG_VERBOSE = 3
+    LOG_ERROR = 3
 
     def confirm(self, msg, default):
         return default
