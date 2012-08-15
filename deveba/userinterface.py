@@ -1,23 +1,47 @@
+import logging
+from handler import HandlerError
+
 class UserInterface(object):
     CANCEL = "Cancel"
+    LOG_ERROR = 1
+    LOG_INFO = 2
+    LOG_VERBOSE = 3
 
     def confirm(self, msg, default):
         return default
 
     def show_text(self, msg):
-        pass
+        # FIXME: Remove this method
+        self.log(self.LOG_VERBOSE, msg)
+
+    def log(self, log_level, msg):
+        if log_level == self.LOG_VERBOSE:
+            print msg
+        elif log_level == self.LOG_INFO:
+            logging.info(msg)
+        elif log_level == self.LOG_ERROR:
+            logging.error(msg)
+        else:
+            raise Exception("Unknown log level %s" % log_level)
 
     def question(self, msg, choices, default):
         return default
 
+    def do_sync(self, groups):
+        for group in groups:
+            for handler in group.handlers.values():
+                self.log(self.LOG_INFO, "Synchronizing %s" % handler.path)
+                try:
+                    handler.sync(self)
+                except HandlerError, exc:
+                    self.log(self.LOG_ERROR, "Failed: %s" % exc)
+        logging.info("Done")
 
-class InteractiveUserInterface(UserInterface):
+
+class TextUserInterface(UserInterface):
     def confirm(self, msg, default):
         line = raw_input("%s (y/n): " % msg)
         return line.lower() == "y"
-
-    def show_text(self, msg):
-        print msg
 
     def question(self, msg, choices, default):
         def print_choice(pos, text):
@@ -43,4 +67,7 @@ class InteractiveUserInterface(UserInterface):
 
 
 class SilentUserInterface(UserInterface):
-    pass
+    def log(self, log_level, msg):
+        if log_level == self.LOG_VERBOSE:
+            return
+        UserInterface.log(self, log_level, msg)
