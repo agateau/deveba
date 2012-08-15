@@ -55,7 +55,8 @@ class SniUserInterface(QObject, UserInterface):
         self.texts.append(line)
         if len(self.texts) > MAX_TEXTS_LENGTH:
             self.texts.pop(0)
-        self.sni.setToolTipSubTitle("<br>".join(self.texts))
+        html = "<ul>" + "".join(["<li>%s</li>" % x for x in self.texts]) + "</ul>"
+        self.sni.setToolTipSubTitle(html)
 
     def do_sync(self, groups):
         def work_function():
