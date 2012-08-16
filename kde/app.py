@@ -37,7 +37,7 @@ class App(KApplication):
     def exec_(self):
         args = KCmdLineArgs.parsedArgs()
         config_file = args.getOption("config")
-        config = core.load_config(core.CONFIG_FILE)
+        config = core.load_config(config_file)
 
         if args.count() > 0:
             group_names = [unicode(args.arg(x)) for x in range(args.count())]
