@@ -36,6 +36,9 @@ class App(KApplication):
 
     def exec_(self):
         args = KCmdLineArgs.parsedArgs()
+
+        core.setup_logger("-")
+
         config_file = args.getOption("config")
         config = core.load_config(config_file)
 

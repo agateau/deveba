@@ -25,23 +25,6 @@ if HAS_PYKDE:
 else:
     DEFAULT_USER_INTERFACE = "silent"
 
-def setup_logger(name, quiet):
-    args = {}
-    if quiet:
-        level = logging.WARNING
-    else:
-        level = logging.INFO
-    args["level"] = level
-
-    if name == "-":
-        args["stream"] = sys.stderr
-    else:
-        args["filename"] = name
-
-    args["format"] = "%(levelname)s: %(asctime)s: %(message)s"
-
-    logging.basicConfig(**args)
-
 def do_list(groups):
     for group in groups:
         print group
@@ -82,7 +65,7 @@ def main():
 
     (options, args) = parser.parse_args()
 
-    setup_logger(options.log, options.quiet)
+    core.setup_logger(options.log, options.quiet)
 
     config = core.load_config(options.config)
 
