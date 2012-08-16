@@ -21,7 +21,7 @@ class App(KApplication):
         self.sni.setCategory(KStatusNotifierItem.SystemServices)
         self.sni.setStatus(KStatusNotifierItem.Active)
 
-        self.sni.setIconByName("kde")
+        self.sni.setIconByName("task-accepted")
 
         self.sni.setToolTipTitle(i18n("Deveba"))
 
@@ -42,14 +42,22 @@ class App(KApplication):
         if args.count() > 0:
             group_names = [unicode(args.arg(x)) for x in range(args.count())]
             groups = core.get_group_list(config, group_names)
-            thread = WorkerThread(groups, self)
-            thread.logCalled.connect(self.addLog, Qt.QueuedConnection)
-            thread.start()
-
+            self.startSync(groups)
         else:
             print "FIXME: Show window here"
 
         return KApplication.exec_()
+
+    def startSync(self, groups):
+        thread = WorkerThread(groups, self)
+        thread.logCalled.connect(self.addLog, Qt.QueuedConnection)
+
+        self.sni.setIconByName("task-ongoing")
+        thread.start()
+        thread.finished.connect(self.slotSyncFinished)
+
+    def slotSyncFinished(self):
+        self.sni.setIconByName("task-accepted")
 
     def addLog(self, level, msg):
         if level < UserInterface.LOG_INFO:
