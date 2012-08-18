@@ -27,6 +27,7 @@ class App(KApplication):
         self.sni.setToolTipTitle(i18n("Deveba"))
 
         self.texts = []
+        self.success = True
 
     @staticmethod
     def options():
@@ -54,6 +55,7 @@ class App(KApplication):
         return KApplication.exec_()
 
     def startSync(self, groups):
+        self.success = True
         thread = WorkerThread(groups, self)
         thread.logCalled.connect(self.addLog, Qt.QueuedConnection)
 
@@ -62,7 +64,8 @@ class App(KApplication):
         thread.finished.connect(self.slotSyncFinished)
 
     def slotSyncFinished(self):
-        self.sni.setIconByName("task-accepted")
+        if self.success:
+            self.sni.setIconByName("task-accepted")
         QTimer.singleShot(2 * 60 * 1000, self.quit)
 
     def addLog(self, level, msg):
@@ -76,3 +79,7 @@ class App(KApplication):
             self.texts.pop(0)
         html = "<ul>" + "".join(["<li>%s</li>" % x for x in self.texts]) + "</ul>"
         self.sni.setToolTipSubTitle(html)
+
+        if level >= UserInterface.LOG_WARNING:
+            self.success = False
+            self.sni.setIconByName("dialog-error")
