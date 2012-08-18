@@ -6,6 +6,7 @@ from PyQt4.QtGui import *
 from PyKDE4.kdecore import *
 from PyKDE4.kdeui import *
 
+import fiximportdir
 from deveba import core
 from deveba.userinterface import UserInterface
 from workerthread import WorkerThread
