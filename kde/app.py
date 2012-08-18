@@ -10,17 +10,10 @@ import fiximportdir
 from deveba import core
 from deveba.userinterface import UserInterface
 from logmessage import LogMessage
+from window import Window
 from workerthread import WorkerThread
 
 MAX_TEXTS_LENGTH = 4
-
-class Window(QWidget):
-    def __init__(self, app):
-        QWidget.__init__(self)
-        self.app = app
-
-    def closeEvent(self):
-        self.app.quit()
 
 class App(KApplication):
     def __init__(self):
@@ -90,7 +83,8 @@ class App(KApplication):
             return
 
         timestamp = time.localtime()
-        self.logMessages.append(LogMessage(timestamp, level, msg))
+        message = LogMessage(timestamp, level, msg)
+        self.logMessages.append(message)
 
         texts = [x.formatted() for x in self.logMessages[-MAX_TEXTS_LENGTH:]]
         html = "<ul>" + "".join(["<li>%s</li>" % x for x in texts]) + "</ul>"
@@ -99,3 +93,5 @@ class App(KApplication):
         if level >= UserInterface.LOG_WARNING:
             self.success = False
             self.sni.setIconByName("dialog-error")
+
+        self.window.addLog(message)
