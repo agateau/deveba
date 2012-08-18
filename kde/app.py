@@ -31,6 +31,7 @@ class App(KApplication):
     @staticmethod
     def options():
         options = KCmdLineOptions()
+        options.add("log <file>", ki18n("Write log to file"), "-")
         options.add("c").add("config <file>", ki18n("Config file to use"), core.CONFIG_FILE)
         options.add("+[group]", ki18n("Start backup of $group"))
         return options
@@ -38,7 +39,7 @@ class App(KApplication):
     def exec_(self):
         args = KCmdLineArgs.parsedArgs()
 
-        core.setup_logger("-")
+        core.setup_logger(unicode(args.getOption("log")))
 
         config_file = args.getOption("config")
         config = core.load_config(config_file)
