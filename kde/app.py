@@ -9,9 +9,18 @@ from PyKDE4.kdeui import *
 import fiximportdir
 from deveba import core
 from deveba.userinterface import UserInterface
+from logmessage import LogMessage
 from workerthread import WorkerThread
 
 MAX_TEXTS_LENGTH = 4
+
+class Window(QWidget):
+    def __init__(self, app):
+        QWidget.__init__(self)
+        self.app = app
+
+    def closeEvent(self):
+        self.app.quit()
 
 class App(KApplication):
     def __init__(self):
@@ -26,7 +35,11 @@ class App(KApplication):
 
         self.sni.setToolTipTitle(i18n("Deveba"))
 
-        self.texts = []
+        self.window = Window(self)
+        self.window.hide()
+        self.sni.setAssociatedWidget(self.window)
+
+        self.logMessages = []
         self.success = True
 
     @staticmethod
@@ -50,7 +63,7 @@ class App(KApplication):
             groups = core.get_group_list(config, group_names)
             self.startSync(groups)
         else:
-            print "FIXME: Show window here"
+            self.window.show()
 
         return KApplication.exec_()
 
@@ -66,18 +79,21 @@ class App(KApplication):
     def slotSyncFinished(self):
         if self.success:
             self.sni.setIconByName("task-accepted")
-        QTimer.singleShot(2 * 60 * 1000, self.quit)
+        QTimer.singleShot(2 * 60 * 1000, self.quitIfNoWindow)
+
+    def quitIfNoWindow(self):
+        if not self.window.isVisible():
+            self.quit()
 
     def addLog(self, level, msg):
         if level < UserInterface.LOG_INFO:
             return
 
-        tm = time.localtime()
-        line = "%02d:%02d %s" % (tm.tm_hour, tm.tm_min, msg)
-        self.texts.append(line)
-        if len(self.texts) > MAX_TEXTS_LENGTH:
-            self.texts.pop(0)
-        html = "<ul>" + "".join(["<li>%s</li>" % x for x in self.texts]) + "</ul>"
+        timestamp = time.localtime()
+        self.logMessages.append(LogMessage(timestamp, level, msg))
+
+        texts = [x.formatted() for x in self.logMessages[-MAX_TEXTS_LENGTH:]]
+        html = "<ul>" + "".join(["<li>%s</li>" % x for x in texts]) + "</ul>"
         self.sni.setToolTipSubTitle(html)
 
         if level >= UserInterface.LOG_WARNING:
