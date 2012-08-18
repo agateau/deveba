@@ -6,24 +6,6 @@ from optparse import OptionParser
 import core
 
 from userinterface import TextUserInterface, SilentUserInterface
-try:
-    from PyKDE4.kdecore import *
-    from PyKDE4.kdeui import *
-    HAS_PYKDE = True
-except ImportError:
-    HAS_PYKDE = False
-
-USER_INTERFACE_DICT = {
-    "text": TextUserInterface,
-    "silent": SilentUserInterface
-}
-
-if HAS_PYKDE:
-    from sniuserinterface import SniUserInterface
-    USER_INTERFACE_DICT["sni"] = SniUserInterface
-    DEFAULT_USER_INTERFACE = "sni"
-else:
-    DEFAULT_USER_INTERFACE = "silent"
 
 def do_list(groups):
     for group in groups:
@@ -44,12 +26,7 @@ def main():
 
     parser.add_option("-i", "--interactive",
                       action="store_true", dest="interactive",
-                      help="prompt before actions [DEPRECATED]")
-
-    parser.add_option("--interface",
-                      dest="interface", default=DEFAULT_USER_INTERFACE,
-                      help="user interface to use. Possible values: %s. (default to %s)"
-                      % (USER_INTERFACE_DICT.keys(), DEFAULT_USER_INTERFACE))
+                      help="prompt before actions")
 
     parser.add_option("-a", "--all",
                       action="store_true", dest="all",
@@ -83,10 +60,9 @@ def main():
         return 1
 
     if options.interactive:
-        print "Deprecated option '--interactive' should be replaced with '--interface=text'"
         ui = TextUserInterface()
     else:
-        ui = USER_INTERFACE_DICT[options.interface]()
+        ui = SilentUserInterface()
 
     ui.do_sync(groups)
 
