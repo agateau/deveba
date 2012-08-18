@@ -10,8 +10,7 @@ class UserInterface(object):
     def confirm(self, msg, default):
         return default
 
-    def show_text(self, msg):
-        # FIXME: Remove this method
+    def log_verbose(self, msg):
         self.log(self.LOG_VERBOSE, msg)
 
     def log(self, log_level, msg):

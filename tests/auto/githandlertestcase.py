@@ -105,14 +105,14 @@ class GitRepoTestCase(unittest.TestCase):
 
 class TestUserInterface(SilentUserInterface):
     def __init__(self):
-        self.show_text_calls = []
+        self.log_verbose_calls = []
         self.question_answers = []
 
     def add_question_answer(self, answer):
         self.question_answers.append(answer)
 
-    def show_text(self, text):
-        self.show_text_calls.append(text)
+    def log_verbose(self, text):
+        self.log_verbose_calls.append(text)
 
     def question(self, msg, choices, default):
         return self.question_answers.pop(0)
@@ -155,6 +155,6 @@ class GitHandlerTestCase(unittest.TestCase):
         status = self.repository.get_status()
         self.assert_(not status.has_changes())
 
-        self.assertEqual(ui.show_text_calls.pop(0), "Modified files:\n- modified\n\nNew files:\n- new\n")
-        self.assertEqual(ui.show_text_calls.pop(0), diff)
+        self.assertEqual(ui.log_verbose_calls.pop(0), "Modified files:\n- modified\n\nNew files:\n- new\n")
+        self.assertEqual(ui.log_verbose_calls.pop(0), diff)
 

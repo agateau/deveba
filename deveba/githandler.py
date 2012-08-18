@@ -126,7 +126,7 @@ class GitHandler(Handler):
 
         if status.has_changes():
             while True:
-                ui.show_text("Modified files:\n%s\n\nNew files:\n%s\n"
+                ui.log_verbose("Modified files:\n%s\n\nNew files:\n%s\n"
                     % (format_list(status.modified_files), format_list(status.new_files))
                     )
                 choices = ["Commit", "Show Diff"]
@@ -136,7 +136,7 @@ class GitHandler(Handler):
                     self._commit(status.new_files)
                     break
                 elif answer == "Show Diff":
-                    ui.show_text(self.repo.run_git("diff"))
+                    ui.log_verbose(self.repo.run_git("diff"))
                 elif answer == ui.CANCEL:
                     logging.warning("Cancelled commit")
                     break
