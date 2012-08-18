@@ -63,6 +63,7 @@ class App(KApplication):
 
     def slotSyncFinished(self):
         self.sni.setIconByName("task-accepted")
+        QTimer.singleShot(2 * 60 * 1000, self.quit)
 
     def addLog(self, level, msg):
         if level < UserInterface.LOG_INFO:
