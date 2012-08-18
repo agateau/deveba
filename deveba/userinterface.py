@@ -5,7 +5,8 @@ class UserInterface(object):
     CANCEL = "Cancel"
     LOG_VERBOSE = 1
     LOG_INFO = 2
-    LOG_ERROR = 3
+    LOG_WARNING = 3
+    LOG_ERROR = 4
 
     def confirm(self, msg, default):
         return default
@@ -13,11 +14,22 @@ class UserInterface(object):
     def log_verbose(self, msg):
         self.log(self.LOG_VERBOSE, msg)
 
+    def log_info(self, msg):
+        self.log(self.LOG_INFO, msg)
+
+    def log_warning(self, msg):
+        self.log(self.LOG_WARNING, msg)
+
+    def log_error(self, msg):
+        self.log(self.LOG_ERROR, msg)
+
     def log(self, log_level, msg):
         if log_level == self.LOG_VERBOSE:
             print msg
         elif log_level == self.LOG_INFO:
             logging.info(msg)
+        elif log_level == self.LOG_WARNING:
+            logging.warning(msg)
         elif log_level == self.LOG_ERROR:
             logging.error(msg)
         else:
