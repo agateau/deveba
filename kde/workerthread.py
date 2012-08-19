@@ -7,8 +7,8 @@ from deveba.userinterface import UserInterface
 class WorkerThread(QThread, UserInterface):
     logCalled = pyqtSignal(int, QString)
 
-    def __init__(self, groups, parent):
-        QThread.__init__(self, parent)
+    def __init__(self, groups):
+        QThread.__init__(self)
         self.groups = groups
 
     def log(self, level, msg):

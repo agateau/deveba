@@ -18,6 +18,7 @@ MAX_TEXTS_LENGTH = 4
 class App(KApplication):
     def __init__(self):
         KApplication.__init__(self)
+        self.setQuitOnLastWindowClosed(False)
 
         self.sni = KStatusNotifierItem()
         self.sni.setTitle(i18n("Deveba"))
@@ -30,10 +31,12 @@ class App(KApplication):
 
         self.window = Window(self)
         self.window.hide()
+        self.window.finished.connect(self.slotWindowClosed)
         self.sni.setAssociatedWidget(self.window)
 
         self.logMessages = []
         self.success = True
+        self.workerThread = None
 
     @staticmethod
     def options():
@@ -62,17 +65,22 @@ class App(KApplication):
 
     def startSync(self, groups):
         self.success = True
-        thread = WorkerThread(groups, self)
-        thread.logCalled.connect(self.addLog, Qt.QueuedConnection)
+        self.workerThread = WorkerThread(groups)
+        self.workerThread.logCalled.connect(self.addLog, Qt.QueuedConnection)
 
         self.sni.setIconByName("task-ongoing")
-        thread.start()
-        thread.finished.connect(self.slotSyncFinished)
+        self.workerThread.start()
+        self.workerThread.finished.connect(self.slotSyncFinished)
 
     def slotSyncFinished(self):
         if self.success:
             self.sni.setIconByName("task-accepted")
+        self.workerThread = None
         QTimer.singleShot(2 * 60 * 1000, self.quitIfNoWindow)
+
+    def slotWindowClosed(self):
+        if self.workerThread is None:
+            self.quit()
 
     def quitIfNoWindow(self):
         if not self.window.isVisible():

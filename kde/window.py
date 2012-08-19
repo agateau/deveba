@@ -20,8 +20,5 @@ class Window(KDialog):
         self.listWidget.addItem(item)
         self.listWidget.scrollToItem(item)
 
-    def closeEvent(self):
-        self.app.quit()
-
     def sizeHint(self):
         return QSize(600, 300)
