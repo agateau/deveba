@@ -1,5 +1,4 @@
 import os
-import logging
 
 from shell import shell
 
@@ -126,35 +125,35 @@ class GitHandler(Handler):
 
         if status.has_changes():
             while True:
-                ui.show_text("Modified files:\n%s\n\nNew files:\n%s\n"
+                ui.log_verbose("Modified files:\n%s\n\nNew files:\n%s\n"
                     % (format_list(status.modified_files), format_list(status.new_files))
                     )
                 choices = ["Commit", "Show Diff"]
                 answer = ui.question("Uncommitted changes detected", choices, "Commit")
                 if answer == "Commit":
-                    logging.info("Committing changes")
+                    ui.log_info("Committing changes")
                     self._commit(status.new_files)
                     break
                 elif answer == "Show Diff":
-                    ui.show_text(self.repo.run_git("diff"))
+                    ui.log_verbose(self.repo.run_git("diff"))
                 elif answer == ui.CANCEL:
-                    logging.warning("Cancelled commit")
+                    ui.log_warning("Cancelled commit")
                     break
 
         self.repo.run_git("fetch")
 
         if self.repo.need_merge():
             if not ui.confirm("Upstream changes fetched, merge them?", True):
-                logging.warning("Cancelled merge")
+                ui.log_warning("Cancelled merge")
                 return
-            logging.info("Merging upstream changes")
+            ui.log_info("Merging upstream changes")
             self.repo.merge("origin/master")
 
         if self.repo.need_push():
             if not ui.confirm("Local changes not pushed, push them?", True):
-                logging.warning("Cancelled push")
+                ui.log_warning("Cancelled push")
                 return
-            logging.info("Pushing changes")
+            ui.log_info("Pushing changes")
             self.repo.run_git("push")
 
     def _commit(self, new_files):
