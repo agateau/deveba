@@ -1,3 +1,5 @@
+import errno
+
 from path import path
 from shell import Command
 
@@ -31,7 +33,11 @@ class UnisonHandler(Handler):
 
         cmd = Command(bin_name)
         profile = profile_for_path(self.path)
-        result = cmd("-ui", "text", "-terse", "-batch", profile)
+        try:
+            result = cmd("-ui", "text", "-terse", "-batch", profile)
+        except OSError, exc:
+            if exc.errno == errno.ENOENT:
+                raise HandlerError("Failed to find a binary named %s" % bin_name)
         if result.returncode != 0:
             raise HandlerError("unison failed with errorcode %d.\n%s" % \
                 (result.returncode, result.stderr))
