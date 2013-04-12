@@ -9,6 +9,12 @@ def profile_for_path(path):
     return path.split(":")[1]
 
 class UnisonHandler(Handler):
+    """
+    Unison handler
+    Supported options:
+    - version: if set, the name of the unison binary is set to
+      "unison-$version" instead of "unison"
+    """
     __slots__ = ["repo"]
 
     @classmethod
