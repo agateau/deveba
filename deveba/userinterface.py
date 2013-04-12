@@ -40,6 +40,7 @@ class UserInterface(object):
         return default
 
     def do_sync(self, groups):
+        ret = 0
         for group in groups:
             for handler in group.handlers.values():
                 self.log(self.LOG_INFO, "Synchronizing %s" % handler.path)
@@ -47,10 +48,13 @@ class UserInterface(object):
                     handler.sync(self)
                 except HandlerError, exc:
                     self.log(self.LOG_ERROR, "Synchronisation failed: %s" % exc)
+                    ret = 1
                 except Exception, exc:
                     self.log(self.LOG_ERROR, "Exception: %s" % exc)
                     self.log(self.LOG_ERROR, traceback.format_exc())
+                    ret = 2
         self.log(self.LOG_INFO, "Done")
+        return ret
 
 
 class TextUserInterface(UserInterface):

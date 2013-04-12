@@ -64,9 +64,7 @@ def main():
     else:
         ui = SilentUserInterface()
 
-    ui.do_sync(groups)
-
-    return 0
+    return ui.do_sync(groups)
 
 
 if __name__ == "__main__":
