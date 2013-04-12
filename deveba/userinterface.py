@@ -1,4 +1,5 @@
 import logging
+import traceback
 from handler import HandlerError
 
 class UserInterface(object):
@@ -45,7 +46,10 @@ class UserInterface(object):
                 try:
                     handler.sync(self)
                 except HandlerError, exc:
-                    self.log(self.LOG_ERROR, "Failed: %s" % exc)
+                    self.log(self.LOG_ERROR, "Synchronisation failed: %s" % exc)
+                except Exception, exc:
+                    self.log(self.LOG_ERROR, "Exception: %s" % exc)
+                    self.log(self.LOG_ERROR, traceback.format_exc())
         self.log(self.LOG_INFO, "Done")
 
 
