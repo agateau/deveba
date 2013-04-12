@@ -37,7 +37,7 @@ class UnisonHandler(Handler):
             result = cmd("-ui", "text", "-terse", "-batch", profile)
         except OSError, exc:
             if exc.errno == errno.ENOENT:
-                raise HandlerError("Failed to find a binary named %s" % bin_name)
+                raise HandlerError("Failed to find or run a binary named %s" % bin_name)
         if result.returncode != 0:
             raise HandlerError("unison failed with errorcode %d.\n%s" % \
                 (result.returncode, result.stderr))
