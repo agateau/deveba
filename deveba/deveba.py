@@ -10,7 +10,7 @@ from userinterface import TextUserInterface, SilentUserInterface
 def do_list(groups):
     for group in groups:
         print group
-        for handler in group.handlers.values():
+        for handler in group.handlers:
             print "- %s" % handler
 
 def main():

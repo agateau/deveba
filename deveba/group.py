@@ -6,7 +6,7 @@ class Group(object):
 
     def __init__(self):
         self.name = ""
-        self.handlers = {}
+        self.handlers = []
 
     def __str__(self):
         return self.name

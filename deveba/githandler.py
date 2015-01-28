@@ -113,15 +113,24 @@ class GitRepo(object):
 class GitHandler(Handler):
     __slots__ = ["repo"]
 
+    def __init__(self, repo_path):
+        Handler.__init__(self)
+        self.repo = GitRepo(repo_path)
+
     @classmethod
-    def can_handle(cls, path):
-        return (path / ".git").exists()
+    def create(cls, repo_path):
+        if (repo_path / ".git").exists():
+            return GitHandler(repo_path)
+        else:
+            return None
+
+    def __str__(self):
+        return "git: " + self.repo.path
 
     def sync(self, ui):
         def format_list(lst):
             return "\n".join("- " + x for x in lst)
 
-        self.repo = GitRepo(self.path)
         status = self.repo.get_status()
 
         if status.has_changes():

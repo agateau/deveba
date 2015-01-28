@@ -125,9 +125,7 @@ class GitHandlerTestCase(unittest.TestCase):
         os.chdir(self.repository.path)
 
     def create_test_handler(self):
-        handler = GitHandler()
-        handler.path = self.repository.path
-        return handler
+        return GitHandler(self.repository.path)
 
     def tearDown(self):
         os.chdir(self.old_cwd)

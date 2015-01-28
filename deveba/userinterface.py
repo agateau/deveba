@@ -42,8 +42,8 @@ class UserInterface(object):
     def do_sync(self, groups):
         ret = 0
         for group in groups:
-            for handler in group.handlers.values():
-                self.log(self.LOG_INFO, "Synchronizing %s" % handler.path)
+            for handler in group.handlers:
+                self.log(self.LOG_INFO, "Synchronizing %s" % handler)
                 try:
                     handler.sync(self)
                 except HandlerError, exc:

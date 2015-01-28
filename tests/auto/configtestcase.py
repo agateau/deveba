@@ -23,9 +23,16 @@ TEST_CONFIG="""
 """
 
 class TestHandler(Handler):
+    def __init__(self, path):
+        self.path = path
+
     @classmethod
-    def can_handle(self, path):
-        return True
+    def create(self, path):
+        return TestHandler(path)
+
+    def __str__(self):
+        return self.path
+
 
 class ConfigTestCase(unittest.TestCase):
     def test_parse(self):
@@ -40,20 +47,15 @@ class ConfigTestCase(unittest.TestCase):
 
         group = config.groups["daily"]
         self.assertEqual(len(group.handlers), 2)
-        self.assert_("/daily1" in group.handlers)
-        self.assert_("/daily2" in group.handlers)
+        self.assertEqual(group.handlers[0].path, "/daily1")
+        self.assertEqual(group.handlers[1].path, "/daily2")
 
         group = config.groups["manual"]
         home_path = path("~/manual").expanduser()
         opt_path = "/opt"
         self.assertEqual(len(group.handlers), 2)
-        self.assert_(home_path in group.handlers)
-        self.assert_(opt_path in group.handlers)
-
-        # Check home_path
-        handler = group.handlers[home_path]
-        self.assertEqual(handler.path.__class__, path)
+        self.assertEqual(group.handlers[0].path, home_path)
+        self.assertEqual(group.handlers[1].path, opt_path)
 
         # Check opt_path
-        handler = group.handlers[opt_path]
-        self.assertEqual(handler.options, {"opt1":"foo", "opt2":"bar"})
+        self.assertEqual(group.handlers[1].options, {"opt1":"foo", "opt2":"bar"})

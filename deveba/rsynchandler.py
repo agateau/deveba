@@ -16,33 +16,35 @@ class RsyncHandler(Handler):
     Supported options:
     - destination: The destination file
     """
-    __slots__ = ["src", "_options"]
+    __slots__ = ["_src", "_options"]
 
-    REQUIRED_OPTIONS = ["destination"]
-
-    def __init__(self):
+    def __init__(self, src):
+        Handler.__init__(self)
+        self._src = src
         self._options = {}
 
     @classmethod
-    def can_handle(cls, repo_path):
-        repo_path = parse_path(repo_path)
-        return repo_path and repo_path.exists()
+    def create(cls, repo_path):
+        if not repo_path.startswith("rsync:"):
+            return None
+        src = path(repo_path.split(":")[1]).expanduser()
+        if src and src.exists():
+            return RsyncHandler(src)
+        else:
+            return None
 
-    def get_options(self):
-        return self._options
+    def __str__(self):
+        return "rsync: " + self._src
 
     def set_options(self, value):
         if not "destination" in value:
             raise HandlerError("rsync handler requires the 'destination' option")
-        self._options = value
-    options = property(get_options, set_options)
+        Handler.set_options(self, value)
 
     def sync(self, ui):
         cmd = Command("rsync")
-        src = parse_path(self.path)
-        src += "/"
         dst = path(self._options["destination"])
-        result = cmd("-avzF", "--partial", "--delete", src, dst)
+        result = cmd("-avzF", "--partial", "--delete", self._src + "/", dst)
         if result.returncode != 0:
             raise HandlerError("rsync failed with exit code %d.\n%s" % \
                 (result.returncode, result.stderr))

@@ -17,14 +17,27 @@ class UnisonHandler(Handler):
     - version: if set, the name of the unison binary is set to
       "unison-$version" instead of "unison"
     """
-    __slots__ = ["repo"]
+    __slots__ = ["_profile"]
+
+    def __init__(self, profile):
+        Handler.__init__(self)
+        self._profile = profile
 
     @classmethod
-    def can_handle(cls, repo_path):
+    def create(cls, repo_path):
         profile = profile_for_path(repo_path)
         if profile is None:
             return False
-        return path("~/.unison/%s.prf" % profile).expanduser().exists()
+        if path("~/.unison/%s.prf" % profile).expanduser().exists():
+            return UnisonHandler(profile)
+        else:
+            return None
+
+    def __str__(self):
+        bin_name = "unison"
+        if "version" in self.options:
+            bin_name += "-" + self.options["version"]
+        return bin_name + ": " + self._profile
 
     def sync(self, ui):
         bin_name = "unison"
@@ -32,9 +45,8 @@ class UnisonHandler(Handler):
             bin_name += "-" + self.options["version"]
 
         cmd = Command(bin_name)
-        profile = profile_for_path(self.path)
         try:
-            result = cmd("-ui", "text", "-terse", "-batch", profile)
+            result = cmd("-ui", "text", "-terse", "-batch", self._profile)
         except OSError, exc:
             if exc.errno == errno.ENOENT:
                 raise HandlerError("Failed to find or run a binary named %s" % bin_name)

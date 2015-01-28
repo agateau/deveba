@@ -17,25 +17,25 @@ class Handler(object):
     """
     Base class for repository handlers
     """
-    __slots__ = ["path", "group", "options"]
+    __slots__ = ["group", "_options"]
 
     @classmethod
-    def can_handle(cls, path):
+    def create(cls, path):
         """
-        Must return True if this class can handle the content of 'path'
+        Must return an instance of this class if it can handle the content of 'path'
         """
         raise NotImplementedError
 
     def __init__(self):
-        self.path = path()
         self.group = None
-        self.options = {}
+        self._options = {}
 
-    def __str__(self):
-        txt = self.path
-        if self.options:
-            txt += " (%s)" % self.options
-        return txt
+    def get_options(self):
+        return self._options
+
+    def set_options(self, value):
+        self._options = value
+    options = property(get_options, set_options)
 
     def sync(self, ui):
         raise NotImplementedError
