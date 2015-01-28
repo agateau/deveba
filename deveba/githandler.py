@@ -59,6 +59,7 @@ class GitRepo(object):
             out = result.stdout.strip()
             err = result.stderr.strip()
             msg = []
+            msg.append("command: `git %s`" % " ".join(args))
             if out:
                 msg.append("stdout: %s" % out)
             if err:
