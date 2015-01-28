@@ -118,11 +118,10 @@ class GitHandler(Handler):
         self.repo = GitRepo(repo_path)
 
     @classmethod
-    def create(cls, repo_path):
-        if (repo_path / ".git").exists():
-            return GitHandler(repo_path)
-        else:
+    def create(cls, repo_path, options):
+        if not (repo_path / ".git").exists():
             return None
+        return GitHandler(repo_path)
 
     def __str__(self):
         return "git: " + self.repo.path

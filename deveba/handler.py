@@ -1,5 +1,3 @@
-from path import path
-
 class HandlerError(Exception):
     pass
 
@@ -17,25 +15,18 @@ class Handler(object):
     """
     Base class for repository handlers
     """
-    __slots__ = ["group", "_options"]
+    __slots__ = ["group"]
 
     @classmethod
-    def create(cls, path):
+    def create(cls, repo_path, options):
         """
-        Must return an instance of this class if it can handle the content of 'path'
+        Must return an instance of this class if it can handle the directory at
+        `repo_path` using options from the `options` dictionary
         """
         raise NotImplementedError
 
     def __init__(self):
         self.group = None
-        self._options = {}
-
-    def get_options(self):
-        return self._options
-
-    def set_options(self, value):
-        self._options = value
-    options = property(get_options, set_options)
 
     def sync(self, ui):
         raise NotImplementedError

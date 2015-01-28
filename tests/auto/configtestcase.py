@@ -23,12 +23,13 @@ TEST_CONFIG="""
 """
 
 class TestHandler(Handler):
-    def __init__(self, path):
+    def __init__(self, path, options):
         self.path = path
+        self.options = options
 
     @classmethod
-    def create(self, path):
-        return TestHandler(path)
+    def create(self, path, options):
+        return TestHandler(path, options)
 
     def __str__(self):
         return self.path

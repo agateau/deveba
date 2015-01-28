@@ -42,14 +42,13 @@ class Config(object):
         if repo_path is None:
             raise ParseError("Missing 'path' attribute in repository")
 
+        options = dict(repo_element.attrib)
+        del options["path"]
         for handler_class in self.handler_classes:
-            handler = handler_class.create(repo_path)
+            handler = handler_class.create(repo_path, options)
             if handler:
                 break
         else:
             raise ParseError("Don't know how to handle directory '%s'" % repo_path)
         handler.group = group
-        options = dict(repo_element.attrib)
-        del options["path"]
-        handler.options = options
         group.handlers.append(handler)
