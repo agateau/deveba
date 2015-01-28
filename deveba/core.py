@@ -5,6 +5,7 @@ from path import path
 
 from config import Config
 from githandler import GitHandler
+from rsynchandler import RsyncHandler
 from unisonhandler import UnisonHandler
 
 CONFIG_FILE = "~/.config/deveba/deveba.xml"
@@ -21,6 +22,7 @@ def get_group_list(config, names):
 def load_config(config_filename):
     config = Config()
     config.add_handler_class(GitHandler)
+    config.add_handler_class(RsyncHandler)
     config.add_handler_class(UnisonHandler)
     config.parse(path(config_filename).expanduser())
     return config
