@@ -4,6 +4,7 @@ import sys
 from path import path
 
 from config import Config
+from commandhandler import CommandHandler
 from githandler import GitHandler
 from rsynchandler import RsyncHandler
 from unisonhandler import UnisonHandler
@@ -24,6 +25,7 @@ def load_config(config_filename):
     config.add_handler_class(GitHandler)
     config.add_handler_class(RsyncHandler)
     config.add_handler_class(UnisonHandler)
+    config.add_handler_class(CommandHandler)
     config.parse(path(config_filename).expanduser())
     return config
 
