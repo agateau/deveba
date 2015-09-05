@@ -30,7 +30,7 @@ class RsyncHandler(Handler):
         if options.get("type") != "rsync":
             return None
         try:
-            dst = options["destination"]
+            dst = path(options["destination"]).expanduser()
         except KeyError as exc:
             raise HandlerError("Missing required option: destination")
         return RsyncHandler(repo_path, dst)
