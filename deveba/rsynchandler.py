@@ -33,8 +33,6 @@ class RsyncHandler(Handler):
             dst = options["destination"]
         except KeyError as exc:
             raise HandlerError("Missing required option: destination")
-        if not repo_path.exists():
-            raise HandlerError("Invalid source directory '%s'".format(repo_path))
         return RsyncHandler(repo_path, dst)
 
     def __str__(self):
