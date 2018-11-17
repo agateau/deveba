@@ -1,2 +1,7 @@
 *.pyc
 *.swp
+deveba.egg-info
+build
+dist
+.coverage
+htmlcov

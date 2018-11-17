@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from handler import Handler, HandlerError
+from deveba.handler import Handler, HandlerError
 
 
 class CommandHandler(Handler):

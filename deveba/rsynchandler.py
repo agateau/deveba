@@ -1,13 +1,13 @@
-from path import path
-from shell import Command
+from path import Path
+from deveba.shell import Command
 
-from handler import Handler, HandlerError
+from deveba.handler import Handler, HandlerError
 
 
 def parse_path(repo_path):
     if not repo_path.startswith("rsync:"):
         return False
-    return path(repo_path.split(":")[1]).expanduser()
+    return Path(repo_path.split(":")[1]).expanduser()
 
 
 class RsyncHandler(Handler):
@@ -30,7 +30,7 @@ class RsyncHandler(Handler):
         if options.get("type") != "rsync":
             return None
         try:
-            dst = path(options["destination"]).expanduser()
+            dst = Path(options["destination"]).expanduser()
         except KeyError as exc:
             raise HandlerError("Missing required option: destination")
         return RsyncHandler(repo_path, dst)

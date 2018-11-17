@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as etree
 
-from path import path
+from path import Path
 
-from group import Group
+from deveba.group import Group
 
 class ParseError(Exception):
     pass
@@ -20,7 +20,8 @@ class Config(object):
         self.handler_classes.append(klass)
 
     def parse(self, name):
-        self.parsefp(file(name))
+        with open(name, "r") as fp:
+            self.parsefp(fp)
 
     def parsefp(self, fp):
         tree = etree.parse(fp)
@@ -38,7 +39,7 @@ class Config(object):
             self._parse_repo(group, repo_element)
 
     def _parse_repo(self, group, repo_element):
-        repo_path = path(repo_element.get("path")).expanduser()
+        repo_path = Path(repo_element.get("path")).expanduser()
         if repo_path is None:
             raise ParseError("Missing 'path' attribute in repository")
 

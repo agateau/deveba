@@ -1,9 +1,9 @@
 import os
 
-from shell import shell
+from deveba.shell import shell
 
-import utils
-from handler import Handler, HandlerError, HandlerConflictError
+from deveba import utils
+from deveba.handler import Handler, HandlerError, HandlerConflictError
 
 class GitStatus(object):
     """
@@ -56,8 +56,8 @@ class GitRepo(object):
     def _run_git(*args):
         result = shell.git(*args)
         if result.returncode != 0:
-            out = result.stdout.strip()
-            err = result.stderr.strip()
+            out = str(result.stdout, "utf-8").strip()
+            err = str(result.stderr, "utf-8").strip()
             msg = []
             msg.append("command: `git %s`" % " ".join(args))
             if out:
@@ -65,7 +65,7 @@ class GitRepo(object):
             if err:
                 msg.append("stderr: %s" % err)
             raise HandlerError("\n".join(msg))
-        return result.stdout
+        return str(result.stdout, "utf-8")
 
     def run_git(self, *args):
         old_cwd = os.getcwd()
@@ -101,14 +101,13 @@ class GitRepo(object):
     def merge(self, remote):
         try:
             self.run_git("merge", remote)
-        except HandlerError, exc:
+        except HandlerError as exc:
             status = self.get_status()
             if status.conflicting_files:
-                # Merge failed because of a conflict, raise HandlerConflictError
                 raise HandlerConflictError(status.conflicting_files)
             else:
                 # Something else happened
-                raise exc
+                raise
 
 class GitHandler(Handler):
     __slots__ = ["repo"]
