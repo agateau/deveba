@@ -2,9 +2,9 @@
 import os
 import tempfile
 import unittest
-from StringIO import StringIO
+from io import StringIO
 
-from path import path
+from path import Path
 
 from config import Config
 from handler import Handler
@@ -43,8 +43,8 @@ class ConfigTestCase(unittest.TestCase):
         config.parsefp(fp)
 
         self.assertEqual(len(config.groups), 2)
-        self.assert_("daily" in config.groups)
-        self.assert_("manual" in config.groups)
+        self.assertTrue("daily" in config.groups)
+        self.assertTrue("manual" in config.groups)
 
         group = config.groups["daily"]
         self.assertEqual(len(group.handlers), 2)
@@ -52,7 +52,7 @@ class ConfigTestCase(unittest.TestCase):
         self.assertEqual(group.handlers[1].path, "/daily2")
 
         group = config.groups["manual"]
-        home_path = path("~/manual").expanduser()
+        home_path = Path("~/manual").expanduser()
         opt_path = "/opt"
         self.assertEqual(len(group.handlers), 2)
         self.assertEqual(group.handlers[0].path, home_path)

@@ -1,9 +1,9 @@
 import os
 
-from shell import shell
+from .shell import shell
 
-import utils
-from handler import Handler, HandlerError, HandlerConflictError
+from . import utils
+from .handler import Handler, HandlerError, HandlerConflictError
 
 class GitStatus(object):
     """
@@ -101,7 +101,7 @@ class GitRepo(object):
     def merge(self, remote):
         try:
             self.run_git("merge", remote)
-        except HandlerError, exc:
+        except HandlerError as exc:
             status = self.get_status()
             if status.conflicting_files:
                 # Merge failed because of a conflict, raise HandlerConflictError

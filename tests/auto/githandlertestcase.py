@@ -3,17 +3,17 @@ import os
 import tempfile
 import unittest
 
-from path import path
+from path import Path
 
 from userinterface import SilentUserInterface
 from handler import HandlerConflictError
 from githandler import GitRepo, GitHandler
 
 def create_file(name):
-    path(name).touch()
+    Path(name).touch()
 
 def create_repository():
-    sandbox = path(tempfile.mkdtemp(suffix="-unittest"))
+    sandbox = Path(tempfile.mkdtemp(suffix="-unittest"))
 
     origin_repo_path = sandbox / "repo.git"
     origin_repo_path.mkdir()
@@ -46,7 +46,7 @@ class GitRepoTestCase(unittest.TestCase):
         create_file(new_file2)
 
         status = self.repository.get_status()
-        self.assert_(status.has_changes())
+        self.assertTrue(status.has_changes())
         self.assertEqual(status.modified_files, ["modified"])
         self.assertEqual(status.new_files, [new_file1, new_file2])
 
@@ -77,21 +77,21 @@ class GitRepoTestCase(unittest.TestCase):
         self.repository.run_git("fetch")
         try:
             self.repository.merge("origin/master")
-        except HandlerConflictError, exc:
+        except HandlerConflictError as exc:
             self.assertEqual(exc.conflicting_files, ["conflict"])
         else:
             self.fail("Expected a GitMergeError")
 
 
     def test_need_push(self):
-        self.assert_(not self.repository.need_push())
+        self.assertTrue(not self.repository.need_push())
         create_file("new")
         self.repository.add("new")
         self.repository.commit("msg")
-        self.assert_(self.repository.need_push())
+        self.assertTrue(self.repository.need_push())
 
     def test_need_merge(self):
-        self.assert_(not self.repository.need_merge())
+        self.assertTrue(not self.repository.need_merge())
         other_repo_path = self.sandbox / "other_repo"
         other_repo = GitRepo.clone(self.origin_repository.path, other_repo_path)
         create_file(other_repo.path / "new_from_other_repo")
@@ -100,7 +100,7 @@ class GitRepoTestCase(unittest.TestCase):
         other_repo.run_git("push", "origin", "master:master")
 
         self.repository.run_git("fetch")
-        self.assert_(self.repository.need_merge())
+        self.assertTrue(self.repository.need_merge())
 
 
 class TestUserInterface(SilentUserInterface):
@@ -151,7 +151,7 @@ class GitHandlerTestCase(unittest.TestCase):
         handler.sync(ui)
 
         status = self.repository.get_status()
-        self.assert_(not status.has_changes())
+        self.assertTrue(not status.has_changes())
 
         self.assertEqual(ui.log_verbose_calls.pop(0), "Modified files:\n- modified\n\nNew files:\n- new\n")
         self.assertEqual(ui.log_verbose_calls.pop(0), diff)

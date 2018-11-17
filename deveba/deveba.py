@@ -3,15 +3,15 @@ import logging
 import sys
 from optparse import OptionParser
 
-import core
+from . import core
 
-from userinterface import TextUserInterface, SilentUserInterface
+from .userinterface import TextUserInterface, SilentUserInterface
 
 def do_list(groups):
     for group in groups:
-        print group
+        print(group)
         for handler in group.handlers:
-            print "- %s" % handler
+            print("- %s" % handler)
 
 def main():
     parser = OptionParser()
@@ -47,11 +47,11 @@ def main():
     config = core.load_config(options.config)
 
     if options.list:
-        do_list(config.groups.values())
+        do_list(list(config.groups.values()))
         return 0
 
     if options.all:
-        groups = config.groups.values()
+        groups = list(config.groups.values())
     else:
         groups = core.get_group_list(config, args)
 

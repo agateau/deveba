@@ -1,6 +1,6 @@
 import logging
 import traceback
-from handler import HandlerError
+from .handler import HandlerError
 
 class UserInterface(object):
     CANCEL = "Cancel"
@@ -26,7 +26,7 @@ class UserInterface(object):
 
     def log(self, log_level, msg):
         if log_level == self.LOG_VERBOSE:
-            print msg
+            print(msg)
         elif log_level == self.LOG_INFO:
             logging.info(msg)
         elif log_level == self.LOG_WARNING:
@@ -46,10 +46,10 @@ class UserInterface(object):
                 self.log(self.LOG_INFO, "Synchronizing %s" % handler)
                 try:
                     handler.sync(self)
-                except HandlerError, exc:
+                except HandlerError as exc:
                     self.log(self.LOG_ERROR, "Synchronisation failed: %s" % exc)
                     ret = 1
-                except Exception, exc:
+                except Exception as exc:
                     self.log(self.LOG_ERROR, "Exception: %s" % exc)
                     self.log(self.LOG_ERROR, traceback.format_exc())
                     ret = 2
@@ -59,26 +59,26 @@ class UserInterface(object):
 
 class TextUserInterface(UserInterface):
     def confirm(self, msg, default):
-        line = raw_input("%s (y/n): " % msg)
+        line = input("%s (y/n): " % msg)
         return line.lower() == "y"
 
     def question(self, msg, choices, default):
         def print_choice(pos, text):
-            print "%d) %s" % (pos, text)
+            print("%d) %s" % (pos, text))
 
-        print
-        print msg
+        print()
+        print(msg)
         for pos, choice in enumerate(choices):
             print_choice(pos + 1, choice)
         print_choice(0, "Cancel")
         while True:
-            line = raw_input(": ")
+            line = input(": ")
             if not line.isdigit():
-                print "Invalid answer %s" % line
+                print("Invalid answer %s" % line)
                 continue
             answer = int(line)
             if answer < 0 or answer >= len(choices):
-                print "Invalid answer %s" % line
+                print("Invalid answer %s" % line)
             if answer == 0:
                 return self.CANCEL
             else:

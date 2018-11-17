@@ -149,7 +149,7 @@ class Command(object):
         # Can we chain the two together?
         if not isinstance(other, self.__class__):
             raise TypeError("Can only chain commands together")
-        if not self.defer or not hasattr(self, 'next') or self.next:
+        if not self.defer or not hasattr(self, 'next') or self.__next__:
             raise ValueError("Command not chainable or already chained")
         if not other.defer or not hasattr(other, 'prev') or other.prev:
             raise ValueError("Command not chainable or already chained")

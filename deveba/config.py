@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as etree
 
-from path import path
+from path import Path
 
-from group import Group
+from .group import Group
 
 class ParseError(Exception):
     pass
@@ -38,7 +38,7 @@ class Config(object):
             self._parse_repo(group, repo_element)
 
     def _parse_repo(self, group, repo_element):
-        repo_path = path(repo_element.get("path")).expanduser()
+        repo_path = Path(repo_element.get("path")).expanduser()
         if repo_path is None:
             raise ParseError("Missing 'path' attribute in repository")
 

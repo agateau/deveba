@@ -1,13 +1,13 @@
 import logging
 import sys
 
-from path import path
+from path import Path
 
-from config import Config
-from commandhandler import CommandHandler
-from githandler import GitHandler
-from rsynchandler import RsyncHandler
-from unisonhandler import UnisonHandler
+from .config import Config
+from .commandhandler import CommandHandler
+from .githandler import GitHandler
+from .rsynchandler import RsyncHandler
+from .unisonhandler import UnisonHandler
 
 CONFIG_FILE = "~/.config/deveba/deveba.xml"
 
@@ -26,7 +26,7 @@ def load_config(config_filename):
     config.add_handler_class(RsyncHandler)
     config.add_handler_class(UnisonHandler)
     config.add_handler_class(CommandHandler)
-    config.parse(path(config_filename).expanduser())
+    config.parse(Path(config_filename).expanduser())
     return config
 
 def setup_logger(name, quiet=False):

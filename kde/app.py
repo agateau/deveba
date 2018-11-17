@@ -49,13 +49,13 @@ class App(KApplication):
     def exec_(self):
         args = KCmdLineArgs.parsedArgs()
 
-        core.setup_logger(unicode(args.getOption("log")))
+        core.setup_logger(str(args.getOption("log")))
 
         config_file = args.getOption("config")
         config = core.load_config(config_file)
 
         if args.count() > 0:
-            group_names = [unicode(args.arg(x)) for x in range(args.count())]
+            group_names = [str(args.arg(x)) for x in range(args.count())]
             groups = core.get_group_list(config, group_names)
             self.startSync(groups)
         else:

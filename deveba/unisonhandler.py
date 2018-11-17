@@ -1,9 +1,9 @@
 import errno
 
-from path import path
-from shell import Command
+from path import Path
+from .shell import Command
 
-from handler import Handler, HandlerError
+from .handler import Handler, HandlerError
 
 def profile_for_path(path):
     if not path.startswith("unison:"):
@@ -31,7 +31,7 @@ class UnisonHandler(Handler):
         profile = profile_for_path(repo_path)
         if profile is None:
             return None
-        if path("~/.unison/%s.prf" % profile).expanduser().exists():
+        if Path("~/.unison/%s.prf" % profile).expanduser().exists():
             return UnisonHandler(profile, options.get("version"))
         else:
             return None
@@ -43,7 +43,7 @@ class UnisonHandler(Handler):
         cmd = Command(self._bin_name)
         try:
             result = cmd("-ui", "text", "-terse", "-batch", self._profile)
-        except OSError, exc:
+        except OSError as exc:
             if exc.errno == errno.ENOENT:
                 raise HandlerError("Failed to find or run a binary named %s" % self._bin_name)
         if result.returncode != 0:
