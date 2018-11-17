@@ -3,3 +3,5 @@
 deveba.egg-info
 build
 dist
+.coverage
+htmlcov
