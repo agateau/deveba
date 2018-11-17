@@ -1,11 +1,8 @@
-import os
 import unittest
-import sys
-
-sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, "deveba"))
 
 from githandlertestcase import GitRepoTestCase, GitHandlerTestCase
 from configtestcase import ConfigTestCase
+from svntestcase import SvnTestCase
 
 def main():
     unittest.main()
