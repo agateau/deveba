@@ -8,6 +8,7 @@ from deveba.commandhandler import CommandHandler
 from deveba.githandler import GitHandler
 from deveba.rsynchandler import RsyncHandler
 from deveba.unisonhandler import UnisonHandler
+from deveba.svnhandler import SvnHandler
 
 CONFIG_FILE = "~/.config/deveba/deveba.xml"
 
@@ -26,6 +27,7 @@ def load_config(config_filename):
     config.add_handler_class(RsyncHandler)
     config.add_handler_class(UnisonHandler)
     config.add_handler_class(CommandHandler)
+    config.add_handler_class(SvnHandler)
     config.parse(Path(config_filename).expanduser())
     return config
 
