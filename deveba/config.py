@@ -20,7 +20,8 @@ class Config(object):
         self.handler_classes.append(klass)
 
     def parse(self, name):
-        self.parsefp(file(name))
+        with open(name, "r") as fp:
+            self.parsefp(fp)
 
     def parsefp(self, fp):
         tree = etree.parse(fp)
