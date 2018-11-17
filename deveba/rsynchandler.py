@@ -1,7 +1,7 @@
 from path import Path
-from .shell import Command
+from deveba.shell import Command
 
-from .handler import Handler, HandlerError
+from deveba.handler import Handler, HandlerError
 
 
 def parse_path(repo_path):

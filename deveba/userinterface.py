@@ -1,6 +1,6 @@
 import logging
 import traceback
-from .handler import HandlerError
+from deveba.handler import HandlerError
 
 class UserInterface(object):
     CANCEL = "Cancel"

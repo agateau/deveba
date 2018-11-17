@@ -1,9 +1,9 @@
 import errno
 
 from path import Path
-from .shell import Command
+from deveba.shell import Command
 
-from .handler import Handler, HandlerError
+from deveba.handler import Handler, HandlerError
 
 def profile_for_path(path):
     if not path.startswith("unison:"):

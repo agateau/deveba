@@ -6,8 +6,8 @@ from io import StringIO
 
 from path import Path
 
-from config import Config
-from handler import Handler
+from deveba.config import Config
+from deveba.handler import Handler
 
 TEST_CONFIG="""
 <config>

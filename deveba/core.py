@@ -3,11 +3,11 @@ import sys
 
 from path import Path
 
-from .config import Config
-from .commandhandler import CommandHandler
-from .githandler import GitHandler
-from .rsynchandler import RsyncHandler
-from .unisonhandler import UnisonHandler
+from deveba.config import Config
+from deveba.commandhandler import CommandHandler
+from deveba.githandler import GitHandler
+from deveba.rsynchandler import RsyncHandler
+from deveba.unisonhandler import UnisonHandler
 
 CONFIG_FILE = "~/.config/deveba/deveba.xml"
 

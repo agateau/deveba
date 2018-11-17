@@ -3,9 +3,9 @@ import logging
 import sys
 from optparse import OptionParser
 
-from . import core
+from deveba import core
 
-from .userinterface import TextUserInterface, SilentUserInterface
+from deveba.userinterface import TextUserInterface, SilentUserInterface
 
 def do_list(groups):
     for group in groups:

@@ -2,7 +2,7 @@ import xml.etree.ElementTree as etree
 
 from path import Path
 
-from .group import Group
+from deveba.group import Group
 
 class ParseError(Exception):
     pass
