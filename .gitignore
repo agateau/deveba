@@ -1,2 +1,5 @@
 *.pyc
 *.swp
+deveba.egg-info
+build
+dist
