@@ -70,3 +70,23 @@ class SvnTestCase(unittest.TestCase):
 
             # First checkout must contain new file
             self.assertTrue((local_repo1_dir / "foo").exists())
+
+    def test_remove(self):
+        with TemporaryDirectory() as tmpdirname:
+            # Create a repository with a file in it
+            remote_repo_dir, local_repo1_dir = create_test_setup(tmpdirname,
+                                                                 ["foo"])
+
+            # Checkout the repository
+            local_repo2_dir = Path(tmpdirname) / "local2"
+            checkout(remote_repo_dir, local_repo2_dir)
+
+            # Rm the file from local2
+            (local_repo2_dir / "foo").remove()
+
+            # Sync local2
+            run_svn_handler(local_repo2_dir)
+
+            # Sync local1, the file should be gone
+            run_svn_handler(local_repo1_dir)
+            self.assertFalse((local_repo1_dir / "foo").exists())
