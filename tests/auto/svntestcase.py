@@ -59,30 +59,34 @@ class SvnTestCase(unittest.TestCase):
         with TemporaryDirectory() as tmpdirname:
             remote_repo_dir, local_repo1_dir = create_test_setup(tmpdirname)
 
-            # Create a second checkout, add a file
+            # Create a second checkout, add files
             local_repo2_dir = Path(tmpdirname) / "local2"
             checkout(remote_repo_dir, local_repo2_dir)
-            (local_repo2_dir / "foo").touch()
+            create_files(local_repo2_dir, ["foo", "bar/baz"])
             run_svn_handler(local_repo2_dir)
 
             # Update first checkout
             run_svn_handler(local_repo1_dir)
 
-            # First checkout must contain new file
+            # First checkout must contain new files
             self.assertTrue((local_repo1_dir / "foo").exists())
+            self.assertTrue((local_repo1_dir / "bar/baz").exists())
 
     def test_remove(self):
         with TemporaryDirectory() as tmpdirname:
             # Create a repository with a file in it
             remote_repo_dir, local_repo1_dir = create_test_setup(tmpdirname,
-                                                                 ["foo"])
+                                                                 ["foo",
+                                                                  "dir1/bar",
+                                                                  "dir2/baz"])
 
             # Checkout the repository
             local_repo2_dir = Path(tmpdirname) / "local2"
             checkout(remote_repo_dir, local_repo2_dir)
 
-            # Rm the file from local2
+            # Rm files from local2
             (local_repo2_dir / "foo").remove()
+            (local_repo2_dir / "dir1").rmtree()
 
             # Sync local2
             run_svn_handler(local_repo2_dir)
@@ -90,3 +94,4 @@ class SvnTestCase(unittest.TestCase):
             # Sync local1, the file should be gone
             run_svn_handler(local_repo1_dir)
             self.assertFalse((local_repo1_dir / "foo").exists())
+            self.assertFalse((local_repo1_dir / "dir1").exists())
