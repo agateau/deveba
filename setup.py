@@ -18,6 +18,10 @@ setup(name="deveba",
             "deveba = deveba.main:main",
         ],
     },
+    install_requires=[
+        "path.py==11.5.0",
+        "svn==0.3.46",
+    ],
     classifiers=[
         "License :: OSI Approved :: GPL License",
         "Operating System :: OS Independent",
