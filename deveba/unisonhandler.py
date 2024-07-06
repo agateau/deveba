@@ -1,7 +1,6 @@
-import errno
-
 from path import Path
-from deveba.shell import Command
+
+from deveba.run import run, RunError
 
 from deveba.handler import Handler, HandlerError
 
@@ -43,15 +42,8 @@ class UnisonHandler(Handler):
         return self._bin_name + ": " + self._profile
 
     def sync(self, ui):
-        cmd = Command(self._bin_name)
+        cmd = [self._bin_name, "-ui", "text", "-terse", "-batch", self._profile]
         try:
-            result = cmd("-ui", "text", "-terse", "-batch", self._profile)
-        except OSError as exc:
-            if exc.errno == errno.ENOENT:
-                raise HandlerError(
-                    f"Failed to find or run a binary named {self._bin_name}"
-                ) from None
-        if result.returncode != 0:
-            raise HandlerError(
-                f"unison failed with errorcode {result.returncode}.\n{result.stderr}"
-            ) from None
+            run(cmd)
+        except RunError as exc:
+            raise HandlerError(exc) from None

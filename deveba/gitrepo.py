@@ -1,7 +1,5 @@
-import os
-
 from deveba.handler import HandlerError, HandlerConflictError
-from deveba.shell import shell
+from deveba.run import run, RunError
 
 
 class GitStatus:
@@ -60,28 +58,15 @@ class GitRepo:
         self.path = path
 
     @staticmethod
-    def _run_git(*args):
-        result = shell.git(*args)
-        if result.returncode != 0:
-            out = str(result.stdout, "utf-8").strip()
-            err = str(result.stderr, "utf-8").strip()
-            msg = []
-            arg_str = " ".join(args)
-            msg.append(f"command: `git {arg_str}`")
-            if out:
-                msg.append(f"stdout: {out}")
-            if err:
-                msg.append(f"stderr: {err}")
-            raise HandlerError("\n".join(msg))
-        return str(result.stdout, "utf-8")
+    def _run_git(*args, cwd=None):
+        try:
+            result = run(["git", *args], cwd=cwd)
+        except RunError as exc:
+            raise HandlerError(exc) from None
+        return result.stdout
 
     def run_git(self, *args):
-        old_cwd = os.getcwd()
-        os.chdir(self.path)
-        try:
-            return GitRepo._run_git(*args)
-        finally:
-            os.chdir(old_cwd)
+        return GitRepo._run_git(*args, cwd=self.path)
 
     @staticmethod
     def clone(remote_repository_path, repository_path, *args):

@@ -1,5 +1,6 @@
 from path import Path
-from deveba.shell import Command
+
+from deveba.run import run, RunError
 
 from deveba.handler import Handler, HandlerError
 
@@ -40,9 +41,8 @@ class RsyncHandler(Handler):
         return "rsync: " + self._src
 
     def sync(self, ui):
-        cmd = Command("rsync")
-        result = cmd("-avzF", "--partial", "--delete", self._src + "/", self._dst)
-        if result.returncode != 0:
-            raise HandlerError(
-                f"rsync failed with exit code {result.returncode}.\n{result.stderr}"
-            ) from None
+        cmd = ["rsync", "-avzF", "--partial", "--delete", self._src + "/", self._dst]
+        try:
+            run(cmd)
+        except RunError as exc:
+            raise HandlerError(exc) from None
