@@ -27,4 +27,5 @@ testpaths = [
 [tool.pyright]
 include = [
     "deveba",
+    "tests",
 ]
