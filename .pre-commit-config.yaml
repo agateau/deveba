@@ -29,3 +29,15 @@ repos:
     rev: 0.28.6
     hooks:
       - id: check-github-workflows
+
+  # use a "local" repo and not the pyright hook to ensure pyright runs in the same virtualenv
+  # as the rest of the code
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright
+        entry: pyright
+        language: system
+        types: [python]
+        # do not pass filenames, otherwise Pyright might scan files we don't want it to scan
+        pass_filenames: false

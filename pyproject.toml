@@ -23,3 +23,8 @@ testpaths = [
     "tests/auto/*testcase.py",
     "tests/auto/test_*.py",
 ]
+
+[tool.pyright]
+include = [
+    "deveba",
+]
