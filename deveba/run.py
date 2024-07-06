@@ -2,7 +2,7 @@ import os
 import shlex
 import subprocess
 
-from typing import Mapping, List
+from typing import Mapping, List, Union, Optional
 
 from pathlib import Path
 
@@ -26,13 +26,15 @@ class RunError(Exception):
 
 
 def run(
-    cmd: list[str | Path],
+    cmd: List[Union[str, Path]],
     *,
-    cwd: str | None = None,
-    env: Mapping[str, str] | None = None,
+    cwd: Union[str, Path, None] = None,
+    env: Optional[Mapping[str, str]] = None,
     merge_output: bool = False,
 ) -> subprocess.CompletedProcess:
     str_cmd: list[str] = [str(x) for x in cmd]
+    if cwd is not None:
+        cwd = str(cwd)
     proc = subprocess.run(
         str_cmd,
         stdout=subprocess.PIPE,

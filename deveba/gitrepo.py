@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Optional
+
 from deveba.handler import HandlerError, HandlerConflictError
 from deveba.run import run, RunError
 
@@ -54,11 +57,11 @@ class GitRepo:
 
     __slots__ = ["path"]
 
-    def __init__(self, path):
+    def __init__(self, path: Path):
         self.path = path
 
     @staticmethod
-    def _run_git(*args, cwd=None):
+    def _run_git(*args, cwd: Optional[Path] = None):
         try:
             result = run(["git", *args], cwd=cwd)
         except RunError as exc:
