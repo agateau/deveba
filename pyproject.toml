@@ -22,5 +22,6 @@ select = [
 
 [tool.pytest.ini_options]
 testpaths = [
-    "tests/auto/*testcase.py"
+    "tests/auto/*testcase.py",
+    "tests/auto/test_*.py",
 ]
