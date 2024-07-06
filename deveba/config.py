@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as etree
 from typing import Dict, List, Type
 
-from path import Path
+from pathlib import Path
 
 from deveba.group import Group
 from deveba.handler import Handler

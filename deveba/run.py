@@ -3,7 +3,7 @@ import subprocess
 
 from typing import Mapping, List
 
-from path import Path
+from pathlib import Path
 
 
 class RunError(Exception):

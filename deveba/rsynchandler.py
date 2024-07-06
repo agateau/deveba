@@ -1,4 +1,4 @@
-from path import Path
+from pathlib import Path
 
 from deveba.run import run, RunError
 
@@ -35,7 +35,7 @@ class RsyncHandler(Handler):
         return f"rsync: {self._src}"
 
     def sync(self, ui):
-        cmd = ["rsync", "-avzF", "--partial", "--delete", self._src + "/", self._dst]
+        cmd = ["rsync", "-avzF", "--partial", "--delete", f"{self._src}/", self._dst]
         try:
             run(cmd)
         except RunError as exc:

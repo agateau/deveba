@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from path import Path
+from pathlib import Path
 
 from deveba.config import Config
 from deveba.commandhandler import CommandHandler

@@ -44,8 +44,8 @@ def test_parse(tmp_path: Path):
 
     group = config.groups["daily"]
     assert len(group.handlers) == 2
-    assert group.handlers[0].path == "/daily1"
-    assert group.handlers[1].path == "/daily2"
+    assert group.handlers[0].path == Path("/daily1")
+    assert group.handlers[1].path == Path("/daily2")
 
     group = config.groups["manual"]
     home_path = Path("~/manual").expanduser()
