@@ -104,7 +104,7 @@ class GitRepoTestCase(unittest.TestCase):
         self.assertTrue(self.repository.need_merge())
 
 
-class TestUserInterface(SilentUserInterface):
+class FakeUserInterface(SilentUserInterface):
     def __init__(self):
         self.log_verbose_calls = []
         self.question_answers = []
@@ -146,7 +146,7 @@ class GitHandlerTestCase(unittest.TestCase):
         self.assertEqual(status.new_files, ["new"])
 
         handler = self.create_test_handler()
-        ui = TestUserInterface()
+        ui = FakeUserInterface()
         ui.add_question_answer("Show Diff")
         ui.add_question_answer("Commit")
         handler.sync(ui)

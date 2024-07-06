@@ -1,8 +1,10 @@
+# Deveba
+
 Deveba is a simple wrapper around git to synchronize folders on multiple computers.
 
-# Setup
+## Setup
 
-## Adding a folder to sync
+### Adding a folder to sync
 
 Create a git repository in the folder you want to sync:
 
@@ -30,7 +32,7 @@ Add a cronjob calling deveba with your group:
 
     deveba daily
 
-## Syncing an existing folder
+### Syncing an existing folder
 
 Clone the folder from the server
 
@@ -51,3 +53,10 @@ Create a config file for deveba
 Add a cronjob calling deveba with your group:
 
     deveba daily
+
+## Development
+
+From within a virtualenv:
+
+    pip install -r requirements-dev.txt
+    pytest

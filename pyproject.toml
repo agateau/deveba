@@ -19,3 +19,8 @@ select = [
     # flake8-simplify
     "SIM",
 ]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests/auto/*testcase.py"
+]

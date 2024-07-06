@@ -21,14 +21,14 @@ TEST_CONFIG = """
 """
 
 
-class TestHandler(Handler):
+class FakeHandler(Handler):
     def __init__(self, path, options):
         self.path = path
         self.options = options
 
     @classmethod
     def create(self, path, options):
-        return TestHandler(path, options)
+        return FakeHandler(path, options)
 
     def __str__(self):
         return self.path
@@ -40,7 +40,7 @@ class ConfigTestCase(unittest.TestCase):
             fp.write(TEST_CONFIG.encode("utf-8"))
             fp.seek(0)
             config = Config()
-            config.add_handler_class(TestHandler)
+            config.add_handler_class(FakeHandler)
             config.parse(fp.name)
 
             self.assertEqual(len(config.groups), 2)
