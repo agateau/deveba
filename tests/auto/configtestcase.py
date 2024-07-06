@@ -1,8 +1,4 @@
-# -*- coding: UTF-8 -*-
-import unittest
-from tempfile import NamedTemporaryFile
-
-from path import Path
+from pathlib import Path
 
 from deveba.config import Config
 from deveba.handler import Handler
@@ -27,37 +23,36 @@ class FakeHandler(Handler):
         self.options = options
 
     @classmethod
-    def create(self, path, options):
-        return FakeHandler(path, options)
+    def create(cls, repo_path, options):
+        return FakeHandler(repo_path, options)
 
     def __str__(self):
         return self.path
 
 
-class ConfigTestCase(unittest.TestCase):
-    def test_parse(self):
-        with NamedTemporaryFile() as fp:
-            fp.write(TEST_CONFIG.encode("utf-8"))
-            fp.seek(0)
-            config = Config()
-            config.add_handler_class(FakeHandler)
-            config.parse(fp.name)
+def test_parse(tmp_path: Path):
+    config_path = tmp_path / "config"
+    config_path.write_text(TEST_CONFIG)
 
-            self.assertEqual(len(config.groups), 2)
-            self.assertTrue("daily" in config.groups)
-            self.assertTrue("manual" in config.groups)
+    config = Config()
+    config.add_handler_class(FakeHandler)
+    config.parse(config_path)
 
-            group = config.groups["daily"]
-            self.assertEqual(len(group.handlers), 2)
-            self.assertEqual(group.handlers[0].path, "/daily1")
-            self.assertEqual(group.handlers[1].path, "/daily2")
+    assert len(config.groups) == 2
+    assert "daily" in config.groups
+    assert "manual" in config.groups
 
-            group = config.groups["manual"]
-            home_path = Path("~/manual").expanduser()
-            opt_path = "/opt"
-            self.assertEqual(len(group.handlers), 2)
-            self.assertEqual(group.handlers[0].path, home_path)
-            self.assertEqual(group.handlers[1].path, opt_path)
+    group = config.groups["daily"]
+    assert len(group.handlers) == 2
+    assert group.handlers[0].path == "/daily1"
+    assert group.handlers[1].path == "/daily2"
 
-            # Check opt_path
-            self.assertEqual(group.handlers[1].options, {"opt1": "foo", "opt2": "bar"})
+    group = config.groups["manual"]
+    home_path = Path("~/manual").expanduser()
+    opt_path = Path("/opt")
+    assert len(group.handlers) == 2
+    assert Path(group.handlers[0].path) == home_path
+    assert Path(group.handlers[1].path) == opt_path
+
+    # Check opt_path
+    assert group.handlers[1].options == {"opt1": "foo", "opt2": "bar"}
