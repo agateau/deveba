@@ -50,8 +50,8 @@ class UnisonHandler(Handler):
             if exc.errno == errno.ENOENT:
                 raise HandlerError(
                     f"Failed to find or run a binary named {self._bin_name}"
-                )
+                ) from None
         if result.returncode != 0:
             raise HandlerError(
                 f"unison failed with errorcode {result.returncode}.\n{result.stderr}"
-            )
+            ) from None

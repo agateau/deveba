@@ -53,4 +53,4 @@ class SvnHandler(Handler):
                 ui.log_verbose("No local changes")
 
         except SvnException as exc:
-            raise HandlerError(str(exc))
+            raise HandlerError(str(exc)) from None

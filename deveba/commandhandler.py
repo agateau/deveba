@@ -27,7 +27,7 @@ class CommandHandler(Handler):
         try:
             command = options["command"]
         except KeyError:
-            raise HandlerError("Missing required option: command")
+            raise HandlerError("Missing required option: command") from None
         if not repo_path.exists():
             raise HandlerError(f"Invalid path '{repo_path}'")
         return CommandHandler(repo_path, command)
@@ -43,6 +43,6 @@ class CommandHandler(Handler):
         except subprocess.CalledProcessError as exc:
             raise HandlerError(
                 f"Command failed with exit code {exc.returncode}.\n{exc.output}"
-            )
+            ) from None
         finally:
             os.chdir(old_cwd)

@@ -33,7 +33,7 @@ class RsyncHandler(Handler):
         try:
             dst = Path(options["destination"]).expanduser()
         except KeyError:
-            raise HandlerError("Missing required option: destination")
+            raise HandlerError("Missing required option: destination") from None
         return RsyncHandler(repo_path, dst)
 
     def __str__(self):
@@ -44,6 +44,5 @@ class RsyncHandler(Handler):
         result = cmd("-avzF", "--partial", "--delete", self._src + "/", self._dst)
         if result.returncode != 0:
             raise HandlerError(
-                "rsync failed with exit code %d.\n%s"
-                % (result.returncode, result.stderr)
-            )
+                f"rsync failed with exit code {result.returncode}.\n{result.stderr}"
+            ) from None

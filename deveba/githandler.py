@@ -114,7 +114,7 @@ class GitRepo:
         except HandlerError:
             status = self.get_status()
             if status.conflicting_files:
-                raise HandlerConflictError(status.conflicting_files)
+                raise HandlerConflictError(status.conflicting_files) from None
             else:
                 # Something else happened
                 raise
