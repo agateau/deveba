@@ -23,7 +23,7 @@ def get_group_list(config, names):
     return groups
 
 
-def load_config(config_filename):
+def load_config(config_filename) -> Config:
     config = Config()
     config.add_handler_class(GitHandler)
     config.add_handler_class(RsyncHandler)

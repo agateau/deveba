@@ -1,13 +1,13 @@
 import shlex
 import subprocess
 
-from typing import Mapping
+from typing import Mapping, List
 
 from path import Path
 
 
 class RunError(Exception):
-    def __init__(self, cmd: list[str], proc: subprocess.CompletedProcess):
+    def __init__(self, cmd: List[str], proc: subprocess.CompletedProcess):
         cmd_str = " ".join(shlex.quote(x) for x in cmd)
         msg = (
             f"Command '{cmd_str}' failed with exit code {proc.returncode}\n"

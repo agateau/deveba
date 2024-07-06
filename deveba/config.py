@@ -1,8 +1,10 @@
 import xml.etree.ElementTree as etree
+from typing import Dict, List, Type
 
 from path import Path
 
 from deveba.group import Group
+from deveba.handler import Handler
 
 
 class ParseError(Exception):
@@ -17,8 +19,8 @@ class Config:
     __slots__ = ["groups", "handler_classes"]
 
     def __init__(self):
-        self.groups = {}
-        self.handler_classes = []
+        self.groups: Dict[str, Group] = {}
+        self.handler_classes: List[Type[Handler]] = []
 
     def add_handler_class(self, klass):
         self.handler_classes.append(klass)
