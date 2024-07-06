@@ -77,10 +77,7 @@ def main():
         logging.error("Nothing to synchronize")
         return 1
 
-    if options.interactive:
-        ui = TextUserInterface()
-    else:
-        ui = SilentUserInterface()
+    ui = TextUserInterface() if options.interactive else SilentUserInterface()
 
     return ui.do_sync(groups)
 

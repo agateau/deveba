@@ -36,10 +36,7 @@ def load_config(config_filename):
 
 def setup_logger(name, quiet=False):
     args = {}
-    if quiet:
-        level = logging.WARNING
-    else:
-        level = logging.INFO
+    level = logging.WARNING if quiet else logging.INFO
     args["level"] = level
 
     if name == "-":

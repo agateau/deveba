@@ -16,4 +16,6 @@ select = [
     "UP",
     # bugbear
     "B",
+    # flake8-simplify
+    "SIM",
 ]
