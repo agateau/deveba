@@ -1,6 +1,4 @@
-import tempfile
-
-from path import Path
+from pathlib import Path
 
 from deveba.gitrepo import GitRepo
 
@@ -10,10 +8,7 @@ def write_file(name, content=""):
         f.write(content)
 
 
-def create_repository(sandbox: Path | None = None):
-    if sandbox is None:
-        sandbox = Path(tempfile.mkdtemp(suffix="-unittest"))
-
+def create_repository(sandbox: Path):
     origin_repo_path = sandbox / "repo.git"
     origin_repo_path.mkdir()
     origin_repo = GitRepo(origin_repo_path)

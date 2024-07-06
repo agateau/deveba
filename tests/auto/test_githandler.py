@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import os
-import unittest
+from pathlib import Path
+
+import pytest
 
 from deveba.userinterface import SilentUserInterface
 from deveba.githandler import GitHandler
@@ -22,18 +24,19 @@ class FakeUserInterface(SilentUserInterface):
         return self.question_answers.pop(0)
 
 
-class GitHandlerTestCase(unittest.TestCase):
-    def setUp(self):
-        self.old_cwd = os.getcwd()
-        self.sandbox, self.origin_repository, self.repository = create_repository()
+class TestGitHandler:
+    @pytest.fixture(autouse=True)
+    def setup_sandbox(self, tmp_path: Path):
+        old_cwd = os.getcwd()
+        self.sandbox, self.origin_repository, self.repository = create_repository(
+            tmp_path
+        )
         os.chdir(self.repository.path)
 
-    def create_test_handler(self):
-        return GitHandler(self.repository.path)
-
-    def tearDown(self):
-        os.chdir(self.old_cwd)
-        self.sandbox.rmtree()
+        try:
+            yield
+        finally:
+            os.chdir(old_cwd)
 
     def test_sync(self):
         write_file("new")
@@ -45,20 +48,20 @@ class GitHandlerTestCase(unittest.TestCase):
         diff = self.repository.run_git("diff")
 
         status = self.repository.get_status()
-        self.assertEqual(status.modified_files, ["modified"])
-        self.assertEqual(status.new_files, ["new"])
+        assert status.modified_files == ["modified"]
+        assert status.new_files == ["new"]
 
-        handler = self.create_test_handler()
+        handler = GitHandler(self.repository.path)
         ui = FakeUserInterface()
         ui.add_question_answer("Show Diff")
         ui.add_question_answer("Commit")
         handler.sync(ui)
 
         status = self.repository.get_status()
-        self.assertTrue(not status.has_changes())
+        assert not status.has_changes()
 
-        self.assertEqual(
-            ui.log_verbose_calls.pop(0),
-            "Modified files:\n- modified\n\nNew files:\n- new\n",
+        assert (
+            ui.log_verbose_calls.pop(0)
+            == "Modified files:\n- modified\n\nNew files:\n- new\n"
         )
-        self.assertEqual(ui.log_verbose_calls.pop(0), diff)
+        assert ui.log_verbose_calls.pop(0) == diff
