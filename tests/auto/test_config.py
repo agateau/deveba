@@ -1,6 +1,8 @@
 from pathlib import Path
+from typing import List
 
 from deveba.config import Config
+from deveba.group import Group
 from deveba.handler import Handler
 
 TEST_CONFIG = """
@@ -30,6 +32,16 @@ class FakeHandler(Handler):
         return self.path
 
 
+def get_handlers(group: Group) -> List[FakeHandler]:
+    """Helper function to return the handlers of a group as a list of FakeHandler
+    instead of a list of Handler"""
+    lst: List[FakeHandler] = []
+    for handler in group.handlers:
+        assert isinstance(handler, FakeHandler)
+        lst.append(handler)
+    return lst
+
+
 def test_parse(tmp_path: Path):
     config_path = tmp_path / "config"
     config_path.write_text(TEST_CONFIG)
@@ -43,16 +55,14 @@ def test_parse(tmp_path: Path):
     assert "manual" in config.groups
 
     group = config.groups["daily"]
-    assert len(group.handlers) == 2
-    assert group.handlers[0].path == Path("/daily1")
-    assert group.handlers[1].path == Path("/daily2")
+    handlers = get_handlers(group)
+    assert [x.path for x in handlers] == [Path("/daily1"), Path("/daily2")]
 
     group = config.groups["manual"]
+    handlers = get_handlers(group)
     home_path = Path("~/manual").expanduser()
     opt_path = Path("/opt")
-    assert len(group.handlers) == 2
-    assert Path(group.handlers[0].path) == home_path
-    assert Path(group.handlers[1].path) == opt_path
+    assert [x.path for x in handlers] == [home_path, opt_path]
 
     # Check opt_path
-    assert group.handlers[1].options == {"opt1": "foo", "opt2": "bar"}
+    assert handlers[1].options == {"opt1": "foo", "opt2": "bar"}

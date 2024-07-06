@@ -1,3 +1,8 @@
+from typing import List
+
+from deveba.handler import Handler
+
+
 class Group:
     """
     Represent a group of repository handlers from the config file
@@ -7,7 +12,7 @@ class Group:
 
     def __init__(self):
         self.name = ""
-        self.handlers = []
+        self.handlers: List[Handler] = []
 
     def __str__(self):
         return self.name
