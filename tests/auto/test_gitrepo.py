@@ -1,20 +1,25 @@
 import os
-import unittest
+from pathlib import Path
+
+import pytest
 
 from deveba.gitrepo import GitRepo
 from deveba.handler import HandlerConflictError
 from tests.auto.utils import write_file, create_repository
 
 
-class GitRepoTestCase(unittest.TestCase):
-    def setUp(self):
-        self.old_cwd = os.getcwd()
-        self.sandbox, self.origin_repository, self.repository = create_repository()
+class TestGitRepo:
+    @pytest.fixture(autouse=True)
+    def setup_sandbox(self, tmp_path: Path):
+        old_cwd = os.getcwd()
+        self.sandbox, self.origin_repository, self.repository = create_repository(
+            tmp_path
+        )
         os.chdir(self.repository.path)
-
-    def tearDown(self):
-        os.chdir(self.old_cwd)
-        self.sandbox.rmtree()
+        try:
+            yield
+        finally:
+            os.chdir(old_cwd)
 
     def test_get_status(self):
         write_file("modified")
@@ -25,9 +30,9 @@ class GitRepoTestCase(unittest.TestCase):
         write_file(new_file2)
 
         status = self.repository.get_status()
-        self.assertTrue(status.has_changes())
-        self.assertEqual(status.modified_files, ["modified"])
-        self.assertEqual(status.new_files, [new_file1, new_file2])
+        assert status.has_changes()
+        assert status.modified_files == ["modified"]
+        assert status.new_files == [new_file1, new_file2]
 
     def test_merge_conflict(self):
         # Create a file and push it
@@ -54,20 +59,19 @@ class GitRepoTestCase(unittest.TestCase):
 
         # Try to merge
         self.repository.run_git("fetch")
-        with self.assertRaises(HandlerConflictError) as cm:
+        with pytest.raises(HandlerConflictError) as cm:
             self.repository.merge("origin/master")
-        exc = cm.exception
-        self.assertEqual(exc.conflicting_files, ["conflict"])
+        assert cm.value.conflicting_files == ["conflict"]
 
     def test_need_push(self):
-        self.assertTrue(not self.repository.need_push())
+        assert not self.repository.need_push()
         write_file("new")
         self.repository.add("new")
         self.repository.commit("msg")
-        self.assertTrue(self.repository.need_push())
+        assert self.repository.need_push()
 
     def test_need_merge(self):
-        self.assertTrue(not self.repository.need_merge())
+        assert not self.repository.need_merge()
         other_repo_path = self.sandbox / "other_repo"
         other_repo = GitRepo.clone(self.origin_repository.path, other_repo_path)
         write_file(other_repo.path / "new_from_other_repo")
@@ -76,4 +80,4 @@ class GitRepoTestCase(unittest.TestCase):
         other_repo.run_git("push", "origin", "master:master")
 
         self.repository.run_git("fetch")
-        self.assertTrue(self.repository.need_merge())
+        assert self.repository.need_merge()

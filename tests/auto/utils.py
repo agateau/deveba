@@ -10,8 +10,9 @@ def write_file(name, content=""):
         f.write(content)
 
 
-def create_repository():
-    sandbox = Path(tempfile.mkdtemp(suffix="-unittest"))
+def create_repository(sandbox: Path | None = None):
+    if sandbox is None:
+        sandbox = Path(tempfile.mkdtemp(suffix="-unittest"))
 
     origin_repo_path = sandbox / "repo.git"
     origin_repo_path.mkdir()
