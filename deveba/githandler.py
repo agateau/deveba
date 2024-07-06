@@ -51,7 +51,7 @@ class GitHandler(Handler):
                 ui.log_warning("Cancelled merge")
                 return
             ui.log_info("Merging upstream changes")
-            self.repo.merge("origin/master")
+            self.repo.merge(f"origin/{self.repo.default_branch}")
 
         if self.repo.need_push():
             if not ui.confirm("Local changes not pushed, push them?", True):

@@ -1,3 +1,8 @@
+import re
+from functools import cached_property
+from pathlib import Path
+from typing import Optional
+
 from deveba.handler import HandlerError, HandlerConflictError
 from deveba.run import run, RunError
 
@@ -52,13 +57,27 @@ class GitRepo:
     Helper class to run git commands
     """
 
-    __slots__ = ["path"]
-
-    def __init__(self, path):
+    def __init__(self, path: Path):
         self.path = path
 
+    @cached_property
+    def default_branch(self) -> str:
+        output = self.run_git("ls-remote", "--symref", "origin", "HEAD")
+
+        # `output` looks like this:
+        #
+        # ref: refs/heads/master\tHEAD
+        # d7511c76395ec4e8c2607ff5a55487190457d178\tHEAD
+        #
+        # We want the part after "refs/heads/"
+        match = re.search(r"^ref: refs/heads/([^\t]+)\t", output)
+        if not match:
+            raise HandlerError(f"Can't read default branch from {output}")
+
+        return match.group(1)
+
     @staticmethod
-    def _run_git(*args, cwd=None):
+    def _run_git(*args, cwd: Optional[Path] = None):
         try:
             result = run(["git", *args], cwd=cwd)
         except RunError as exc:
@@ -78,7 +97,7 @@ class GitRepo:
         return GitStatus(out)
 
     def need_push(self):
-        out = self.run_git("rev-list", "origin/master..")
+        out = self.run_git("rev-list", f"origin/{self.default_branch}..")
         return len(out.strip()) > 0
 
     def add(self, *files):
@@ -88,7 +107,7 @@ class GitRepo:
         self.run_git("commit", "-m", msg, *args)
 
     def need_merge(self):
-        out = self.run_git("rev-list", "..origin/master")
+        out = self.run_git("rev-list", f"..origin/{self.default_branch}")
         return len(out.strip()) > 0
 
     def merge(self, remote):

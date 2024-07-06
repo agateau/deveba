@@ -4,27 +4,22 @@ from typing import List
 from deveba.gitrepo import GitRepo
 
 
-def write_file(name, content=""):
-    with open(name, "w") as f:
-        f.write(content)
-
-
-def create_repository(sandbox: Path):
+def create_repository(sandbox: Path, *, default_branch="master"):
     origin_repo_path = sandbox / "repo.git"
     origin_repo_path.mkdir()
     origin_repo = GitRepo(origin_repo_path)
-    origin_repo.run_git("init", "--bare")
+    origin_repo.run_git("init", "--bare", "--initial-branch", default_branch)
 
     repo = GitRepo.clone(origin_repo.path, sandbox / "repo", "--no-hardlinks")
-    write_file(repo.path / "dummy")
+    (repo.path / "dummy").touch()
     repo.add("dummy")
     repo.commit("created")
-    repo.run_git("push", "origin", "master:master")
+    repo.run_git("push", "origin", f"{default_branch}")
     return sandbox, origin_repo, repo
 
 
-def create_files(repo_dir: Path, files: List[str]) -> None:
+def create_files(base_dir: Path, files: List[str]) -> None:
     for relative_path in files:
-        file_path = repo_dir / relative_path
+        file_path = base_dir / relative_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.touch()
