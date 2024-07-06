@@ -15,8 +15,8 @@ class FakeUserInterface(SilentUserInterface):
     def add_question_answer(self, answer):
         self.question_answers.append(answer)
 
-    def log_verbose(self, text):
-        self.log_verbose_calls.append(text)
+    def log_verbose(self, msg):
+        self.log_verbose_calls.append(msg)
 
     def question(self, msg, choices, default):
         return self.question_answers.pop(0)
