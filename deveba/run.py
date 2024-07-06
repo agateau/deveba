@@ -11,7 +11,7 @@ class RunError(Exception):
         cmd_str = " ".join(shlex.quote(x) for x in cmd)
         msg = (
             f"Command '{cmd_str}' failed with exit code {proc.returncode}\n"
-            "{proc.stdout}"
+            f"{proc.stdout}"
         )
         Exception.__init__(self, msg)
 
