@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from pathlib import Path
 
+import pytest
 
 from deveba.gitrepo import GitRepo
 from deveba.userinterface import SilentUserInterface
@@ -23,8 +24,9 @@ class FakeUserInterface(SilentUserInterface):
         return self.question_answers.pop(0)
 
 
-def test_sync(tmp_path: Path):
-    _, _, repo = create_repository(tmp_path)
+@pytest.mark.parametrize("default_branch", ["master", "iamdefault"])
+def test_sync(tmp_path: Path, default_branch: str):
+    _, _, repo = create_repository(tmp_path, default_branch=default_branch)
 
     # GIVEN a commit containing the file "modified"
     modified_path = repo.path / "modified"
@@ -66,9 +68,10 @@ def test_sync(tmp_path: Path):
     assert ui.log_verbose_calls.pop(0) == diff
 
 
-def test_merge_upstream_changes(tmp_path: Path):
+@pytest.mark.parametrize("default_branch", ["master", "iamdefault"])
+def test_merge_upstream_changes(tmp_path: Path, default_branch):
     # GIVEN a repo and a remote repo
-    _, remote_repo, repo = create_repository(tmp_path)
+    _, remote_repo, repo = create_repository(tmp_path, default_branch=default_branch)
 
     # AND the remote repo has received new changes
     repo2_new_content = "hello from repo2"

@@ -98,3 +98,9 @@ class TestGitRepo:
 
         # THEN need_merge() returns True
         assert self.repository.need_merge()
+
+
+@pytest.mark.parametrize("default_branch", ["master", "iamdefault"])
+def test_default_branch(tmp_path: Path, default_branch):
+    _, _, repo = create_repository(tmp_path, default_branch=default_branch)
+    assert repo.default_branch == default_branch

@@ -4,17 +4,17 @@ from typing import List
 from deveba.gitrepo import GitRepo
 
 
-def create_repository(sandbox: Path):
+def create_repository(sandbox: Path, *, default_branch="master"):
     origin_repo_path = sandbox / "repo.git"
     origin_repo_path.mkdir()
     origin_repo = GitRepo(origin_repo_path)
-    origin_repo.run_git("init", "--bare")
+    origin_repo.run_git("init", "--bare", "--initial-branch", default_branch)
 
     repo = GitRepo.clone(origin_repo.path, sandbox / "repo", "--no-hardlinks")
     (repo.path / "dummy").touch()
     repo.add("dummy")
     repo.commit("created")
-    repo.run_git("push", "origin", "master:master")
+    repo.run_git("push", "origin", f"{default_branch}")
     return sandbox, origin_repo, repo
 
 
