@@ -6,6 +6,7 @@ from pathlib import Path
 
 from deveba.svnhandler import SvnHandler
 from deveba.userinterface import UserInterface
+from tests.auto.utils import create_files
 
 
 def create_remote_repo(repo_dir):
@@ -15,13 +16,6 @@ def create_remote_repo(repo_dir):
 
 def checkout(remote_repo_dir, local_repo_dir):
     run(["svn", "checkout", f"file://{remote_repo_dir}", local_repo_dir])
-
-
-def create_files(repo_dir, files):
-    for relative_path in files:
-        file_path = repo_dir / relative_path
-        file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.touch()
 
 
 def create_test_setup(base_dir: Path, files=None):

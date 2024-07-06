@@ -5,12 +5,6 @@ from deveba.run import run, RunError
 from deveba.handler import Handler, HandlerError
 
 
-def parse_path(repo_path):
-    if not repo_path.startswith("rsync:"):
-        return False
-    return Path(repo_path.split(":")[1]).expanduser()
-
-
 class RsyncHandler(Handler):
     """
     Rsync handler
@@ -38,7 +32,7 @@ class RsyncHandler(Handler):
         return RsyncHandler(repo_path, dst)
 
     def __str__(self):
-        return "rsync: " + self._src
+        return f"rsync: {self._src}"
 
     def sync(self, ui):
         cmd = ["rsync", "-avzF", "--partial", "--delete", self._src + "/", self._dst]

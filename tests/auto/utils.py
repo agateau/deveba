@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 
 from deveba.gitrepo import GitRepo
 
@@ -20,3 +21,10 @@ def create_repository(sandbox: Path):
     repo.commit("created")
     repo.run_git("push", "origin", "master:master")
     return sandbox, origin_repo, repo
+
+
+def create_files(repo_dir: Path, files: List[str]) -> None:
+    for relative_path in files:
+        file_path = repo_dir / relative_path
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.touch()
