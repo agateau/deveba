@@ -1,0 +1,43 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  # Markdown
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.41.0
+    hooks:
+      - id: markdownlint-fix
+        args: []
+
+  # Python
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.1
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # Check GitHub workflows
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.28.6
+    hooks:
+      - id: check-github-workflows
+
+  # use a "local" repo and not the pyright hook to ensure pyright runs in the same virtualenv
+  # as the rest of the code
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright
+        entry: pyright
+        language: system
+        types: [python]
+        # do not pass filenames, otherwise Pyright might scan files we don't want it to scan
+        pass_filenames: false

@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from path import Path
+from pathlib import Path
 
 from deveba.config import Config
 from deveba.commandhandler import CommandHandler
@@ -12,16 +12,18 @@ from deveba.svnhandler import SvnHandler
 
 CONFIG_FILE = "~/.config/deveba/deveba.xml"
 
+
 def get_group_list(config, names):
     groups = []
     for name in names:
         group = config.groups.get(name)
         if not group:
-            raise ValueError("No group named '%s'" % name)
+            raise ValueError(f"No group named '{name}'")
         groups.append(group)
     return groups
 
-def load_config(config_filename):
+
+def load_config(config_filename) -> Config:
     config = Config()
     config.add_handler_class(GitHandler)
     config.add_handler_class(RsyncHandler)
@@ -31,12 +33,10 @@ def load_config(config_filename):
     config.parse(Path(config_filename).expanduser())
     return config
 
+
 def setup_logger(name, quiet=False):
     args = {}
-    if quiet:
-        level = logging.WARNING
-    else:
-        level = logging.INFO
+    level = logging.WARNING if quiet else logging.INFO
     args["level"] = level
 
     if name == "-":

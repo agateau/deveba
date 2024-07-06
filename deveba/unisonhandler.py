@@ -1,22 +1,18 @@
-import errno
-
-from path import Path
-from deveba.shell import Command
+from deveba.run import run, RunError
 
 from deveba.handler import Handler, HandlerError
 
-def profile_for_path(path):
-    if not path.startswith("unison:"):
-        return None
-    return path.split(":")[1]
 
 class UnisonHandler(Handler):
     """
     Unison handler
     Supported options:
+    - type: "unison"
+    - path: the profile name
     - version: if set, the name of the unison binary is set to
       "unison-$version" instead of "unison"
     """
+
     __slots__ = ["_bin_name", "_profile"]
 
     def __init__(self, profile, version):
@@ -28,24 +24,16 @@ class UnisonHandler(Handler):
 
     @classmethod
     def create(cls, repo_path, options):
-        profile = profile_for_path(repo_path)
-        if profile is None:
+        if options.get("type") != "unison":
             return None
-        if Path("~/.unison/%s.prf" % profile).expanduser().exists():
-            return UnisonHandler(profile, options.get("version"))
-        else:
-            return None
+        return UnisonHandler(repo_path, options.get("version"))
 
     def __str__(self):
-        return self._bin_name + ": " + self._profile
+        return f"{self._bin_name}: {self._profile}"
 
     def sync(self, ui):
-        cmd = Command(self._bin_name)
+        cmd = [self._bin_name, "-ui", "text", "-terse", "-batch", self._profile]
         try:
-            result = cmd("-ui", "text", "-terse", "-batch", self._profile)
-        except OSError as exc:
-            if exc.errno == errno.ENOENT:
-                raise HandlerError("Failed to find or run a binary named %s" % self._bin_name)
-        if result.returncode != 0:
-            raise HandlerError("unison failed with errorcode %d.\n%s" % \
-                (result.returncode, result.stderr))
+            run(cmd)
+        except RunError as exc:
+            raise HandlerError(exc) from None

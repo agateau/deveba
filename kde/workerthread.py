@@ -4,6 +4,7 @@ from PyQt4.QtGui import *
 import fiximportdir
 from deveba.userinterface import UserInterface
 
+
 class WorkerThread(QThread, UserInterface):
     logCalled = pyqtSignal(int, QString)
 

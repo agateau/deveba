@@ -4,7 +4,8 @@ from setuptools import setup
 
 from deveba import __version__, DESCRIPTION
 
-setup(name="deveba",
+setup(
+    name="deveba",
     version=__version__,
     description=DESCRIPTION,
     author="Aurélien Gâteau",
@@ -26,5 +27,5 @@ setup(name="deveba",
         "License :: OSI Approved :: GPL License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-    ]
+    ],
 )

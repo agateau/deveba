@@ -1,26 +1,32 @@
 import xml.etree.ElementTree as etree
+from typing import Dict, List, Type
 
-from path import Path
+from pathlib import Path
 
 from deveba.group import Group
+from deveba.handler import Handler
+
 
 class ParseError(Exception):
     pass
 
-class Config(object):
+
+class Config:
     """
     Parse config and instantiate repository handlers, based on its registered handlers
     """
+
     __slots__ = ["groups", "handler_classes"]
+
     def __init__(self):
-        self.groups = {}
-        self.handler_classes = []
+        self.groups: Dict[str, Group] = {}
+        self.handler_classes: List[Type[Handler]] = []
 
     def add_handler_class(self, klass):
         self.handler_classes.append(klass)
 
     def parse(self, name):
-        with open(name, "r") as fp:
+        with open(name) as fp:
             self.parsefp(fp)
 
     def parsefp(self, fp):
@@ -50,6 +56,6 @@ class Config(object):
             if handler:
                 break
         else:
-            raise ParseError("Don't know how to handle directory '%s'" % repo_path)
+            raise ParseError(f"Don't know how to handle directory '{repo_path}'")
         handler.group = group
         group.handlers.append(handler)

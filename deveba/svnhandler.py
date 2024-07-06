@@ -26,7 +26,7 @@ class SvnHandler(Handler):
         return SvnHandler(repo_path)
 
     def __str__(self):
-        return "svn: " + self.repo.path
+        return f"svn: {self.repo.path}"
 
     def sync(self, ui):
         try:
@@ -34,7 +34,7 @@ class SvnHandler(Handler):
             # back by the update
             local_changes = []
             for entry in self.repo.status():
-                change = "{}: {}".format(entry.name, entry.type_raw_name)
+                change = f"{entry.name}: {entry.type_raw_name}"
                 local_changes.append(change)
                 if entry.type == ST_UNVERSIONED:
                     self.repo.add(entry.name)
@@ -53,4 +53,4 @@ class SvnHandler(Handler):
                 ui.log_verbose("No local changes")
 
         except SvnException as exc:
-            raise HandlerError(str(exc))
+            raise HandlerError(str(exc)) from None

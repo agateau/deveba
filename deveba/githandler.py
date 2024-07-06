@@ -1,113 +1,7 @@
-import os
-
-from deveba.shell import shell
-
+from deveba.gitrepo import GitRepo
 from deveba import utils
-from deveba.handler import Handler, HandlerError, HandlerConflictError
+from deveba.handler import Handler
 
-class GitStatus(object):
-    """
-    Parses the output of git status --porcelain -z into usable fields
-    """
-    __slots__ = ["modified_files", "new_files", "conflicting_files"]
-
-    def __init__(self, out):
-        """
-        out is the output of `git status --porcelain -z`
-        """
-
-        CONFLICT_STATES = [
-            "DD",
-            "AU",
-            "UD",
-            "UA",
-            "DU",
-            "AA",
-            "UU",
-            ]
-        self.modified_files = []
-        self.new_files = []
-        self.conflicting_files = []
-
-        for line in out.split("\0"):
-            if len(line) == 0:
-                continue
-            state = line[:2]
-            name = line[3:]
-            if state == "??":
-                self.new_files.append(name)
-            elif state in CONFLICT_STATES:
-                self.conflicting_files.append(name)
-            else:
-                self.modified_files.append(name)
-
-    def has_changes(self):
-        return bool(self.modified_files) or bool(self.new_files) or bool(self.conflicting_files)
-
-class GitRepo(object):
-    """
-    Helper class to run git commands
-    """
-    __slots__ = ["path"]
-    def __init__(self, path):
-        self.path = path
-
-    @staticmethod
-    def _run_git(*args):
-        result = shell.git(*args)
-        if result.returncode != 0:
-            out = str(result.stdout, "utf-8").strip()
-            err = str(result.stderr, "utf-8").strip()
-            msg = []
-            msg.append("command: `git %s`" % " ".join(args))
-            if out:
-                msg.append("stdout: %s" % out)
-            if err:
-                msg.append("stderr: %s" % err)
-            raise HandlerError("\n".join(msg))
-        return str(result.stdout, "utf-8")
-
-    def run_git(self, *args):
-        old_cwd = os.getcwd()
-        os.chdir(self.path)
-        try:
-            return GitRepo._run_git(*args)
-        finally:
-            os.chdir(old_cwd)
-
-    @staticmethod
-    def clone(remote_repository_path, repository_path, *args):
-        GitRepo._run_git("clone", remote_repository_path, repository_path, *args)
-        return GitRepo(repository_path)
-
-    def get_status(self):
-        out = self.run_git("status", "--porcelain", "-z")
-        return GitStatus(out)
-
-    def need_push(self):
-        out = self.run_git("rev-list", "origin/master..")
-        return len(out.strip()) > 0
-
-    def add(self, *files):
-        self.run_git("add", *files)
-
-    def commit(self, msg, *args):
-        self.run_git("commit", "-m", msg, *args)
-
-    def need_merge(self):
-        out = self.run_git("rev-list", "..origin/master")
-        return len(out.strip()) > 0
-
-    def merge(self, remote):
-        try:
-            self.run_git("merge", remote)
-        except HandlerError as exc:
-            status = self.get_status()
-            if status.conflicting_files:
-                raise HandlerConflictError(status.conflicting_files)
-            else:
-                # Something else happened
-                raise
 
 class GitHandler(Handler):
     __slots__ = ["repo"]
@@ -123,7 +17,7 @@ class GitHandler(Handler):
         return GitHandler(repo_path)
 
     def __str__(self):
-        return "git: " + self.repo.path
+        return f"git: {self.repo.path}"
 
     def sync(self, ui):
         def format_list(lst):
@@ -133,9 +27,11 @@ class GitHandler(Handler):
 
         if status.has_changes():
             while True:
-                ui.log_verbose("Modified files:\n%s\n\nNew files:\n%s\n"
-                    % (format_list(status.modified_files), format_list(status.new_files))
-                    )
+                modified_str = format_list(status.modified_files)
+                new_str = format_list(status.new_files)
+                ui.log_verbose(
+                    f"Modified files:\n{modified_str}\n\nNew files:\n{new_str}\n"
+                )
                 choices = ["Commit", "Show Diff"]
                 answer = ui.question("Uncommitted changes detected", choices, "Commit")
                 if answer == "Commit":
@@ -169,5 +65,7 @@ class GitHandler(Handler):
             self.repo.add(*new_files)
 
         msg = utils.generate_commit_message(self.group)
-        author = "%s <%s>" % (utils.get_commit_author_name(), utils.get_commit_author_email())
+        name = utils.get_commit_author_name()
+        email = utils.get_commit_author_email()
+        author = f"{name} <{email}>"
         self.repo.commit(msg, "-a", "--author", author)

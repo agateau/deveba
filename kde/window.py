@@ -4,6 +4,7 @@ from PyQt4.QtGui import *
 from PyKDE4.kdecore import *
 from PyKDE4.kdeui import *
 
+
 class Window(KDialog):
     def __init__(self, app):
         KDialog.__init__(self)

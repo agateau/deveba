@@ -1,13 +1,8 @@
-from path import Path
-from deveba.shell import Command
+from pathlib import Path
+
+from deveba.run import run, RunError
 
 from deveba.handler import Handler, HandlerError
-
-
-def parse_path(repo_path):
-    if not repo_path.startswith("rsync:"):
-        return False
-    return Path(repo_path.split(":")[1]).expanduser()
 
 
 class RsyncHandler(Handler):
@@ -18,6 +13,7 @@ class RsyncHandler(Handler):
     - path: The source dir
     - destination: The destination dir
     """
+
     __slots__ = ["_src", "_dst"]
 
     def __init__(self, src, dst):
@@ -31,16 +27,16 @@ class RsyncHandler(Handler):
             return None
         try:
             dst = Path(options["destination"]).expanduser()
-        except KeyError as exc:
-            raise HandlerError("Missing required option: destination")
+        except KeyError:
+            raise HandlerError("Missing required option: destination") from None
         return RsyncHandler(repo_path, dst)
 
     def __str__(self):
-        return "rsync: " + self._src
+        return f"rsync: {self._src}"
 
     def sync(self, ui):
-        cmd = Command("rsync")
-        result = cmd("-avzF", "--partial", "--delete", self._src + "/", self._dst)
-        if result.returncode != 0:
-            raise HandlerError("rsync failed with exit code %d.\n%s" % \
-                (result.returncode, result.stderr))
+        cmd = ["rsync", "-avzF", "--partial", "--delete", f"{self._src}/", self._dst]
+        try:
+            run(cmd)
+        except RunError as exc:
+            raise HandlerError(exc) from None

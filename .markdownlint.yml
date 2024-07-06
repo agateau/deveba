@@ -1,0 +1,12 @@
+default: true
+ul-indent:
+    indent: 4
+
+line_length: false
+first-line-h1: true
+no-inline-html: false
+
+code-block-style:
+  style: fenced
+fenced-code-language: false
+commands-show-output: false

@@ -1,0 +1,31 @@
+[tool.ruff]
+exclude = [
+    # This code is outdated, but I keep it there for now
+    "kde",
+]
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests/auto/*testcase.py",
+    "tests/auto/test_*.py",
+]
+
+[tool.pyright]
+include = [
+    "deveba",
+    "tests",
+]
