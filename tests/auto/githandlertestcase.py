@@ -9,9 +9,11 @@ from deveba.userinterface import SilentUserInterface
 from deveba.handler import HandlerConflictError
 from deveba.githandler import GitRepo, GitHandler
 
+
 def write_file(name, content=""):
     with open(name, "wt") as f:
         f.write(content)
+
 
 def create_repository():
     sandbox = Path(tempfile.mkdtemp(suffix="-unittest"))
@@ -27,6 +29,7 @@ def create_repository():
     repo.commit("created")
     repo.run_git("push", "origin", "master:master")
     return sandbox, origin_repo, repo
+
 
 class GitRepoTestCase(unittest.TestCase):
     def setUp(self):
@@ -80,7 +83,6 @@ class GitRepoTestCase(unittest.TestCase):
             self.repository.merge("origin/master")
         exc = cm.exception
         self.assertEqual(exc.conflicting_files, ["conflict"])
-
 
     def test_need_push(self):
         self.assertTrue(not self.repository.need_push())
@@ -152,6 +154,8 @@ class GitHandlerTestCase(unittest.TestCase):
         status = self.repository.get_status()
         self.assertTrue(not status.has_changes())
 
-        self.assertEqual(ui.log_verbose_calls.pop(0), "Modified files:\n- modified\n\nNew files:\n- new\n")
+        self.assertEqual(
+            ui.log_verbose_calls.pop(0),
+            "Modified files:\n- modified\n\nNew files:\n- new\n",
+        )
         self.assertEqual(ui.log_verbose_calls.pop(0), diff)
-

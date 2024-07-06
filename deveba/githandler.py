@@ -5,10 +5,12 @@ from deveba.shell import shell
 from deveba import utils
 from deveba.handler import Handler, HandlerError, HandlerConflictError
 
+
 class GitStatus(object):
     """
     Parses the output of git status --porcelain -z into usable fields
     """
+
     __slots__ = ["modified_files", "new_files", "conflicting_files"]
 
     def __init__(self, out):
@@ -24,7 +26,7 @@ class GitStatus(object):
             "DU",
             "AA",
             "UU",
-            ]
+        ]
         self.modified_files = []
         self.new_files = []
         self.conflicting_files = []
@@ -42,13 +44,20 @@ class GitStatus(object):
                 self.modified_files.append(name)
 
     def has_changes(self):
-        return bool(self.modified_files) or bool(self.new_files) or bool(self.conflicting_files)
+        return (
+            bool(self.modified_files)
+            or bool(self.new_files)
+            or bool(self.conflicting_files)
+        )
+
 
 class GitRepo(object):
     """
     Helper class to run git commands
     """
+
     __slots__ = ["path"]
+
     def __init__(self, path):
         self.path = path
 
@@ -101,13 +110,14 @@ class GitRepo(object):
     def merge(self, remote):
         try:
             self.run_git("merge", remote)
-        except HandlerError as exc:
+        except HandlerError:
             status = self.get_status()
             if status.conflicting_files:
                 raise HandlerConflictError(status.conflicting_files)
             else:
                 # Something else happened
                 raise
+
 
 class GitHandler(Handler):
     __slots__ = ["repo"]
@@ -133,9 +143,13 @@ class GitHandler(Handler):
 
         if status.has_changes():
             while True:
-                ui.log_verbose("Modified files:\n%s\n\nNew files:\n%s\n"
-                    % (format_list(status.modified_files), format_list(status.new_files))
+                ui.log_verbose(
+                    "Modified files:\n%s\n\nNew files:\n%s\n"
+                    % (
+                        format_list(status.modified_files),
+                        format_list(status.new_files),
                     )
+                )
                 choices = ["Commit", "Show Diff"]
                 answer = ui.question("Uncommitted changes detected", choices, "Commit")
                 if answer == "Commit":
@@ -169,5 +183,8 @@ class GitHandler(Handler):
             self.repo.add(*new_files)
 
         msg = utils.generate_commit_message(self.group)
-        author = "%s <%s>" % (utils.get_commit_author_name(), utils.get_commit_author_email())
+        author = "%s <%s>" % (
+            utils.get_commit_author_name(),
+            utils.get_commit_author_email(),
+        )
         self.repo.commit(msg, "-a", "--author", author)

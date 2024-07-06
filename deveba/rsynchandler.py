@@ -18,6 +18,7 @@ class RsyncHandler(Handler):
     - path: The source dir
     - destination: The destination dir
     """
+
     __slots__ = ["_src", "_dst"]
 
     def __init__(self, src, dst):
@@ -31,7 +32,7 @@ class RsyncHandler(Handler):
             return None
         try:
             dst = Path(options["destination"]).expanduser()
-        except KeyError as exc:
+        except KeyError:
             raise HandlerError("Missing required option: destination")
         return RsyncHandler(repo_path, dst)
 
@@ -42,5 +43,7 @@ class RsyncHandler(Handler):
         cmd = Command("rsync")
         result = cmd("-avzF", "--partial", "--delete", self._src + "/", self._dst)
         if result.returncode != 0:
-            raise HandlerError("rsync failed with exit code %d.\n%s" % \
-                (result.returncode, result.stderr))
+            raise HandlerError(
+                "rsync failed with exit code %d.\n%s"
+                % (result.returncode, result.stderr)
+            )

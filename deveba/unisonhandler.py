@@ -5,10 +5,12 @@ from deveba.shell import Command
 
 from deveba.handler import Handler, HandlerError
 
+
 def profile_for_path(path):
     if not path.startswith("unison:"):
         return None
     return path.split(":")[1]
+
 
 class UnisonHandler(Handler):
     """
@@ -17,6 +19,7 @@ class UnisonHandler(Handler):
     - version: if set, the name of the unison binary is set to
       "unison-$version" instead of "unison"
     """
+
     __slots__ = ["_bin_name", "_profile"]
 
     def __init__(self, profile, version):
@@ -45,7 +48,11 @@ class UnisonHandler(Handler):
             result = cmd("-ui", "text", "-terse", "-batch", self._profile)
         except OSError as exc:
             if exc.errno == errno.ENOENT:
-                raise HandlerError("Failed to find or run a binary named %s" % self._bin_name)
+                raise HandlerError(
+                    "Failed to find or run a binary named %s" % self._bin_name
+                )
         if result.returncode != 0:
-            raise HandlerError("unison failed with errorcode %d.\n%s" % \
-                (result.returncode, result.stderr))
+            raise HandlerError(
+                "unison failed with errorcode %d.\n%s"
+                % (result.returncode, result.stderr)
+            )

@@ -15,6 +15,7 @@ from workerthread import WorkerThread
 
 MAX_TEXTS_LENGTH = 4
 
+
 class App(KApplication):
     def __init__(self):
         KApplication.__init__(self)
@@ -42,7 +43,9 @@ class App(KApplication):
     def options():
         options = KCmdLineOptions()
         options.add("log <file>", ki18n("Write log to file"), "-")
-        options.add("c").add("config <file>", ki18n("Config file to use"), core.CONFIG_FILE)
+        options.add("c").add(
+            "config <file>", ki18n("Config file to use"), core.CONFIG_FILE
+        )
         options.add("+[group]", ki18n("Start backup of $group"))
         return options
 

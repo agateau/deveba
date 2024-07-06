@@ -12,6 +12,7 @@ class CommandHandler(Handler):
     - path: Where to run the command
     - command: The command to run
     """
+
     __slots__ = ["_path", "_command"]
 
     def __init__(self, path, command):
@@ -25,10 +26,10 @@ class CommandHandler(Handler):
             return None
         try:
             command = options["command"]
-        except KeyError as exc:
+        except KeyError:
             raise HandlerError("Missing required option: command")
         if not repo_path.exists():
-            raise HandlerError("Invalid path '%s'".format(repo_path))
+            raise HandlerError("Invalid path '%s'".format())
         return CommandHandler(repo_path, command)
 
     def __str__(self):
@@ -40,7 +41,8 @@ class CommandHandler(Handler):
         try:
             subprocess.check_output(self._command, stderr=subprocess.STDOUT, shell=True)
         except subprocess.CalledProcessError as exc:
-            raise HandlerError("Command failed with exit code %d.\n%s" % \
-                (exc.returncode, exc.output))
+            raise HandlerError(
+                "Command failed with exit code %d.\n%s" % (exc.returncode, exc.output)
+            )
         finally:
             os.chdir(old_cwd)

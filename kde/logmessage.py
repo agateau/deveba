@@ -8,7 +8,8 @@ LOG_ICON = {
     UserInterface.LOG_INFO: "dialog-information",
     UserInterface.LOG_WARNING: "dialog-warning",
     UserInterface.LOG_ERROR: "dialog-error",
-    }
+}
+
 
 class LogMessage(object):
     def __init__(self, timestamp, level, text):

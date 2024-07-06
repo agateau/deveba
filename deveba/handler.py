@@ -4,6 +4,7 @@ class HandlerError(Exception):
 
 class HandlerConflictError(HandlerError):
     __slots__ = ["conflicting_files"]
+
     def __init__(self, files):
         self.conflicting_files = files
 
@@ -15,6 +16,7 @@ class Handler(object):
     """
     Base class for repository handlers
     """
+
     __slots__ = ["group"]
 
     @classmethod

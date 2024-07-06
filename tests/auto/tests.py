@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa: F401
 import os
 import unittest
 
@@ -20,6 +21,7 @@ def git_env_setup():
 def main():
     git_env_setup()
     unittest.main()
+
 
 if __name__ == "__main__":
     main()

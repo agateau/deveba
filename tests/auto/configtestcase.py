@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-import os
 import unittest
 from tempfile import NamedTemporaryFile
 
@@ -8,7 +7,7 @@ from path import Path
 from deveba.config import Config
 from deveba.handler import Handler
 
-TEST_CONFIG="""
+TEST_CONFIG = """
 <config>
   <group name="daily">
     <repo path="/daily1"/>
@@ -20,6 +19,7 @@ TEST_CONFIG="""
   </group>
 </config>
 """
+
 
 class TestHandler(Handler):
     def __init__(self, path, options):
@@ -60,4 +60,4 @@ class ConfigTestCase(unittest.TestCase):
             self.assertEqual(group.handlers[1].path, opt_path)
 
             # Check opt_path
-            self.assertEqual(group.handlers[1].options, {"opt1":"foo", "opt2":"bar"})
+            self.assertEqual(group.handlers[1].options, {"opt1": "foo", "opt2": "bar"})

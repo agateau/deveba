@@ -12,6 +12,7 @@ from deveba.svnhandler import SvnHandler
 
 CONFIG_FILE = "~/.config/deveba/deveba.xml"
 
+
 def get_group_list(config, names):
     groups = []
     for name in names:
@@ -20,6 +21,7 @@ def get_group_list(config, names):
             raise ValueError("No group named '%s'" % name)
         groups.append(group)
     return groups
+
 
 def load_config(config_filename):
     config = Config()
@@ -30,6 +32,7 @@ def load_config(config_filename):
     config.add_handler_class(SvnHandler)
     config.parse(Path(config_filename).expanduser())
     return config
+
 
 def setup_logger(name, quiet=False):
     args = {}

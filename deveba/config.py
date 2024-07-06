@@ -4,14 +4,18 @@ from path import Path
 
 from deveba.group import Group
 
+
 class ParseError(Exception):
     pass
+
 
 class Config(object):
     """
     Parse config and instantiate repository handlers, based on its registered handlers
     """
+
     __slots__ = ["groups", "handler_classes"]
+
     def __init__(self):
         self.groups = {}
         self.handler_classes = []

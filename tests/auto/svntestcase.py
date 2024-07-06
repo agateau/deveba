@@ -75,10 +75,9 @@ class SvnTestCase(unittest.TestCase):
     def test_remove(self):
         with TemporaryDirectory() as tmpdirname:
             # Create a repository with a file in it
-            remote_repo_dir, local_repo1_dir = create_test_setup(tmpdirname,
-                                                                 ["foo",
-                                                                  "dir1/bar",
-                                                                  "dir2/baz"])
+            remote_repo_dir, local_repo1_dir = create_test_setup(
+                tmpdirname, ["foo", "dir1/bar", "dir2/baz"]
+            )
 
             # Checkout the repository
             local_repo2_dir = Path(tmpdirname) / "local2"

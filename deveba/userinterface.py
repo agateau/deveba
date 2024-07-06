@@ -2,6 +2,7 @@ import logging
 import traceback
 from deveba.handler import HandlerError
 
+
 class UserInterface(object):
     CANCEL = "Cancel"
     LOG_VERBOSE = 1

@@ -1,0 +1,7 @@
+[tool.ruff]
+exclude = [
+    # This code is outdated, but I keep it there for now
+    "kde",
+    # This is vendored code
+    "deveba/shell.py"
+]

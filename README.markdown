@@ -3,6 +3,7 @@ Deveba is a simple wrapper around git to synchronize folders on multiple compute
 # Setup
 
 ## Adding a folder to sync
+
 Create a git repository in the folder you want to sync:
 
     cd ~/my-folder
