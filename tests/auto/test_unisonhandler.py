@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from deveba.core import load_config
+from deveba.unisonhandler import UnisonHandler
 from deveba.userinterface import UserInterface
 from tests.auto.utils import create_files
 
@@ -49,3 +50,8 @@ root = {dir2}
     for name in dir1_files + dir2_files:
         assert (dir1 / name).exists()
         assert (dir2 / name).exists()
+
+
+def test_str():
+    handler = UnisonHandler("foo", "1.2")
+    assert isinstance(str(handler), str)

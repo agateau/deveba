@@ -86,3 +86,8 @@ def test_remove(tmp_path: Path):
     run_svn_handler(local_repo1_dir)
     assert not (local_repo1_dir / "foo").exists()
     assert not (local_repo1_dir / "dir1").exists()
+
+
+def test_str(tmp_path: Path):
+    handler = SvnHandler(tmp_path)
+    assert isinstance(str(handler), str)

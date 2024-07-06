@@ -26,7 +26,7 @@ class SvnHandler(Handler):
         return SvnHandler(repo_path)
 
     def __str__(self):
-        return "svn: " + self.repo.path
+        return f"svn: {self.repo.path}"
 
     def sync(self, ui):
         try:

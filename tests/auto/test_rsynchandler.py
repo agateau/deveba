@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from deveba.core import load_config
+from deveba.rsynchandler import RsyncHandler
 from deveba.userinterface import UserInterface
 from tests.auto.utils import create_files
 
@@ -37,3 +38,8 @@ def test_rsync_handler(tmp_path: Path):
     # THEN the destination dir contains the source dir files
     for name in source_files:
         assert (dst_dir / name).exists()
+
+
+def test_str():
+    handler = RsyncHandler("s", "d")
+    assert isinstance(str(handler), str)

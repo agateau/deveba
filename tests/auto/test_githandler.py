@@ -65,3 +65,7 @@ class TestGitHandler:
             == "Modified files:\n- modified\n\nNew files:\n- new\n"
         )
         assert ui.log_verbose_calls.pop(0) == diff
+
+    def test_str(self):
+        handler = GitHandler(self.repository.path)
+        assert isinstance(str(handler), str)

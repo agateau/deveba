@@ -17,7 +17,7 @@ class GitHandler(Handler):
         return GitHandler(repo_path)
 
     def __str__(self):
-        return "git: " + self.repo.path
+        return f"git: {self.repo.path}"
 
     def sync(self, ui):
         def format_list(lst):
