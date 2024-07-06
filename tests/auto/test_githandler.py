@@ -1,12 +1,11 @@
 # -*- coding: UTF-8 -*-
-import os
 from pathlib import Path
 
 import pytest
 
 from deveba.userinterface import SilentUserInterface
 from deveba.githandler import GitHandler
-from tests.auto.utils import write_file, create_repository
+from tests.auto.utils import create_repository
 
 
 class FakeUserInterface(SilentUserInterface):
@@ -27,39 +26,42 @@ class FakeUserInterface(SilentUserInterface):
 class TestGitHandler:
     @pytest.fixture(autouse=True)
     def setup_sandbox(self, tmp_path: Path):
-        old_cwd = os.getcwd()
-        self.sandbox, self.origin_repository, self.repository = create_repository(
-            tmp_path
-        )
-        os.chdir(self.repository.path)
-
-        try:
-            yield
-        finally:
-            os.chdir(old_cwd)
+        _, _, self.repository = create_repository(tmp_path)
 
     def test_sync(self):
-        write_file("new")
-        write_file("modified")
+        # GIVEN a commit containing the file "modified"
+        modified_path = self.repository.path / "modified"
+        modified_path.touch()
+
         self.repository.add("modified")
         self.repository.commit("commit")
-        write_file("modified", "foo")
 
-        diff = self.repository.run_git("diff")
+        # AND "modified" has been modified after the commit
+        modified_path.write_text("foo")
 
+        # AND a file "new" has been created after the commit
+        new_path = self.repository.path / "new"
+        new_path.touch()
+
+        # THEN repository.get_status() reports them with their correct status
         status = self.repository.get_status()
         assert status.modified_files == ["modified"]
         assert status.new_files == ["new"]
 
+        diff = self.repository.run_git("diff")
+
+        # WHEN syncing the repository
         handler = GitHandler(self.repository.path)
         ui = FakeUserInterface()
         ui.add_question_answer("Show Diff")
         ui.add_question_answer("Commit")
         handler.sync(ui)
 
+        # THEN repository.get_status() does not report any changes
         status = self.repository.get_status()
         assert not status.has_changes()
 
+        # AND the log contains a report of the changes
         assert (
             ui.log_verbose_calls.pop(0)
             == "Modified files:\n- modified\n\nNew files:\n- new\n"

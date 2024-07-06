@@ -1,83 +1,100 @@
-import os
 from pathlib import Path
 
 import pytest
 
 from deveba.gitrepo import GitRepo
 from deveba.handler import HandlerConflictError
-from tests.auto.utils import write_file, create_repository
+from tests.auto.utils import create_repository, create_files
 
 
 class TestGitRepo:
     @pytest.fixture(autouse=True)
     def setup_sandbox(self, tmp_path: Path):
-        old_cwd = os.getcwd()
         self.sandbox, self.origin_repository, self.repository = create_repository(
             tmp_path
         )
-        os.chdir(self.repository.path)
-        try:
-            yield
-        finally:
-            os.chdir(old_cwd)
 
     def test_get_status(self):
-        write_file("modified")
+        # GIVEN a file added to the index
+        modified_file = self.repository.path / "modified"
+        modified_file.write_text("modified")
         self.repository.add("modified")
-        new_file1 = "new"
-        new_file2 = "néè"
-        write_file(new_file1)
-        write_file(new_file2)
 
+        # AND new files
+        new_files = ["new", "néè"]
+        create_files(self.repository.path, new_files)
+
+        # WHEN get_status() is called
         status = self.repository.get_status()
+
+        # THEN it reports changes
         assert status.has_changes()
+
+        # AND the status contains the appropriate details
         assert status.modified_files == ["modified"]
-        assert status.new_files == [new_file1, new_file2]
+        assert status.new_files == new_files
 
     def test_merge_conflict(self):
-        # Create a file and push it
-        conflict = "conflict"
-        write_file(conflict, "Foo")
-        self.repository.add(conflict)
+        # GIVEN a repository with one file named "conflict"
+        conflict_name = "conflict"
+        conflict1_path = self.repository.path / conflict_name
+        conflict1_path.write_text("Foo")
+        self.repository.add(conflict_name)
         self.repository.commit("msg")
         self.repository.run_git("push", "origin", "master:master")
 
-        # Clone the repository and modify 'conflict'
+        # AND the file has been modified from another clone of the repository
         repo2_path = self.sandbox / "repo2"
+        conflict2_path = repo2_path / conflict_name
         repo2 = GitRepo.clone(self.origin_repository.path, repo2_path)
-        write_file(repo2_path / "conflict", "Repo2")
-        repo2.add(conflict)
-        repo2.commit("msg")
 
-        # Push to remote repository
+        conflict2_path.write_text("Repo2")
+        repo2.add(conflict_name)
+        repo2.commit("msg")
         repo2.run_git("push", "origin", "master:master")
 
-        # Modify 'conflict' in self.repository
-        write_file(conflict, "Local")
-        self.repository.add(conflict)
+        # AND I modify "conflict"
+        conflict1_path.write_text("Local")
+        self.repository.add(conflict_name)
         self.repository.commit("msg2")
 
-        # Try to merge
+        # WHEN I try to merge
         self.repository.run_git("fetch")
+
+        # THEN an exception is raised
         with pytest.raises(HandlerConflictError) as cm:
             self.repository.merge("origin/master")
-        assert cm.value.conflicting_files == ["conflict"]
+
+        # AND it lists the conflicting files
+        assert cm.value.conflicting_files == [conflict_name]
 
     def test_need_push(self):
+        # GIVEN self.repository does not need a push
         assert not self.repository.need_push()
-        write_file("new")
+
+        # WHEN a new commit is created
+        (self.repository.path / "new").touch()
         self.repository.add("new")
         self.repository.commit("msg")
+
+        # THEN self.repository needs a push
         assert self.repository.need_push()
 
     def test_need_merge(self):
+        # GIVEN self.repository does not need a merge
         assert not self.repository.need_merge()
+
+        # AND the remote repository has been updated to contain a new file
         other_repo_path = self.sandbox / "other_repo"
         other_repo = GitRepo.clone(self.origin_repository.path, other_repo_path)
-        write_file(other_repo.path / "new_from_other_repo")
+
+        (other_repo.path / "new_from_other_repo").touch()
         other_repo.add("new_from_other_repo")
         other_repo.commit("commit from other repo")
         other_repo.run_git("push", "origin", "master:master")
 
+        # WHEN self.repository is fetched
         self.repository.run_git("fetch")
+
+        # THEN need_merge() returns True
         assert self.repository.need_merge()
