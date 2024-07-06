@@ -34,7 +34,7 @@ class UnisonHandler(Handler):
         profile = profile_for_path(repo_path)
         if profile is None:
             return None
-        if Path("~/.unison/%s.prf" % profile).expanduser().exists():
+        if Path(f"~/.unison/{profile}.prf").expanduser().exists():
             return UnisonHandler(profile, options.get("version"))
         else:
             return None
@@ -49,10 +49,9 @@ class UnisonHandler(Handler):
         except OSError as exc:
             if exc.errno == errno.ENOENT:
                 raise HandlerError(
-                    "Failed to find or run a binary named %s" % self._bin_name
+                    f"Failed to find or run a binary named {self._bin_name}"
                 )
         if result.returncode != 0:
             raise HandlerError(
-                "unison failed with errorcode %d.\n%s"
-                % (result.returncode, result.stderr)
+                f"unison failed with errorcode {result.returncode}.\n{result.stderr}"
             )

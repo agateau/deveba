@@ -11,7 +11,7 @@ from deveba.githandler import GitRepo, GitHandler
 
 
 def write_file(name, content=""):
-    with open(name, "wt") as f:
+    with open(name, "w") as f:
         f.write(content)
 
 

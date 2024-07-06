@@ -6,7 +6,7 @@ from deveba import utils
 from deveba.handler import Handler, HandlerError, HandlerConflictError
 
 
-class GitStatus(object):
+class GitStatus:
     """
     Parses the output of git status --porcelain -z into usable fields
     """
@@ -51,7 +51,7 @@ class GitStatus(object):
         )
 
 
-class GitRepo(object):
+class GitRepo:
     """
     Helper class to run git commands
     """
@@ -68,11 +68,12 @@ class GitRepo(object):
             out = str(result.stdout, "utf-8").strip()
             err = str(result.stderr, "utf-8").strip()
             msg = []
-            msg.append("command: `git %s`" % " ".join(args))
+            arg_str = " ".join(args)
+            msg.append(f"command: `git {arg_str}`")
             if out:
-                msg.append("stdout: %s" % out)
+                msg.append(f"stdout: {out}")
             if err:
-                msg.append("stderr: %s" % err)
+                msg.append(f"stderr: {err}")
             raise HandlerError("\n".join(msg))
         return str(result.stdout, "utf-8")
 
@@ -143,12 +144,10 @@ class GitHandler(Handler):
 
         if status.has_changes():
             while True:
+                modified_str = format_list(status.modified_files)
+                new_str = format_list(status.new_files)
                 ui.log_verbose(
-                    "Modified files:\n%s\n\nNew files:\n%s\n"
-                    % (
-                        format_list(status.modified_files),
-                        format_list(status.new_files),
-                    )
+                    f"Modified files:\n{modified_str}\n\nNew files:\n{new_str}\n"
                 )
                 choices = ["Commit", "Show Diff"]
                 answer = ui.question("Uncommitted changes detected", choices, "Commit")
@@ -183,8 +182,7 @@ class GitHandler(Handler):
             self.repo.add(*new_files)
 
         msg = utils.generate_commit_message(self.group)
-        author = "%s <%s>" % (
-            utils.get_commit_author_name(),
-            utils.get_commit_author_email(),
-        )
+        name = utils.get_commit_author_name()
+        email = utils.get_commit_author_email()
+        author = f"{name} <{email}>"
         self.repo.commit(msg, "-a", "--author", author)

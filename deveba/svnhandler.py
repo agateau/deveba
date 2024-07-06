@@ -34,7 +34,7 @@ class SvnHandler(Handler):
             # back by the update
             local_changes = []
             for entry in self.repo.status():
-                change = "{}: {}".format(entry.name, entry.type_raw_name)
+                change = f"{entry.name}: {entry.type_raw_name}"
                 local_changes.append(change)
                 if entry.type == ST_UNVERSIONED:
                     self.repo.add(entry.name)

@@ -9,7 +9,7 @@ class ParseError(Exception):
     pass
 
 
-class Config(object):
+class Config:
     """
     Parse config and instantiate repository handlers, based on its registered handlers
     """
@@ -24,7 +24,7 @@ class Config(object):
         self.handler_classes.append(klass)
 
     def parse(self, name):
-        with open(name, "r") as fp:
+        with open(name) as fp:
             self.parsefp(fp)
 
     def parsefp(self, fp):
@@ -54,6 +54,6 @@ class Config(object):
             if handler:
                 break
         else:
-            raise ParseError("Don't know how to handle directory '%s'" % repo_path)
+            raise ParseError(f"Don't know how to handle directory '{repo_path}'")
         handler.group = group
         group.handlers.append(handler)

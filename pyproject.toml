@@ -5,3 +5,10 @@ exclude = [
     # This is vendored code
     "deveba/shell.py"
 ]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "UP",
+]

@@ -5,11 +5,7 @@ HOSTNAME = socket.gethostname()
 
 
 def generate_commit_message(group):
-    return "Automatic commit from %s, running on %s (group %s)" % (
-        PROGNAME,
-        HOSTNAME,
-        group,
-    )
+    return f"Automatic commit from {PROGNAME}, running on {HOSTNAME} (group {group})"
 
 
 def get_commit_author_name():

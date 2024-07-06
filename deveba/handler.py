@@ -9,10 +9,10 @@ class HandlerConflictError(HandlerError):
         self.conflicting_files = files
 
     def __str__(self):
-        return "conflicting files: %s" % self.conflicting_files
+        return f"conflicting files: {self.conflicting_files}"
 
 
-class Handler(object):
+class Handler:
     """
     Base class for repository handlers
     """

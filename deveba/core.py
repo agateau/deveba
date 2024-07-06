@@ -18,7 +18,7 @@ def get_group_list(config, names):
     for name in names:
         group = config.groups.get(name)
         if not group:
-            raise ValueError("No group named '%s'" % name)
+            raise ValueError(f"No group named '{name}'")
         groups.append(group)
     return groups
 

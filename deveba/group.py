@@ -1,4 +1,4 @@
-class Group(object):
+class Group:
     """
     Represent a group of repository handlers from the config file
     """

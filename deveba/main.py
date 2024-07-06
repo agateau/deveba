@@ -12,7 +12,7 @@ def do_list(groups):
     for group in groups:
         print(group)
         for handler in group.handlers:
-            print("- %s" % handler)
+            print(f"- {handler}")
 
 
 def main():
@@ -55,7 +55,7 @@ def main():
         "--config",
         dest="config",
         default=core.CONFIG_FILE,
-        help="config file to use (default to %s)" % core.CONFIG_FILE,
+        help=f"config file to use (default to {core.CONFIG_FILE})",
     )
 
     (options, args) = parser.parse_args()
